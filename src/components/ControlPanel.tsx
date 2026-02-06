@@ -1,5 +1,5 @@
 'use client';
-import { useGameStore } from '@/store/gameStore';
+import { useGameStore, canBuyTile } from '@/store/gameStore';
 import { useShallow } from 'zustand/react/shallow';
 import { Dice1, Dice2, Dice3, Dice4, Dice5, Dice6, SkipForward, DollarSign } from 'lucide-react';
 import clsx from 'clsx';
@@ -36,11 +36,7 @@ export function ControlPanel() {
     const activePlayer = players[activePlayerIndex];
     const currentTile = board[activePlayer.position]; // Assuming direct index mapping for now (0-23)
 
-    const canBuy = currentTile &&
-        (currentTile.type === 'PROPERTY' || currentTile.group === 'railroad' || currentTile.group === 'utility') &&
-        !currentTile.owner &&
-        currentTile.price &&
-        activePlayer.money >= currentTile.price;
+    const canBuy = canBuyTile(currentTile, activePlayer);
 
     return (
         <div className="flex flex-col gap-4 bg-white p-6 rounded-xl shadow-lg border border-slate-200 w-full max-w-sm">
