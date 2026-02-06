@@ -8,6 +8,7 @@ export interface Player {
     position: number;
     color: string;
     inJail: boolean;
+    isComputer: boolean;
 }
 
 export interface NewsEffect {
@@ -44,8 +45,8 @@ const MOCK_NEWS: NewsEffect[] = [
 
 export const useGameStore = create<GameState>((set, get) => ({
     players: [
-        { id: 0, name: 'Player 1', money: 1500, position: 0, color: 'bg-red-500', inJail: false },
-        { id: 1, name: 'Player 2', money: 1500, position: 0, color: 'bg-blue-500', inJail: false },
+        { id: 0, name: 'Player 1', money: 1500, position: 0, color: 'bg-red-500', inJail: false, isComputer: false },
+        { id: 1, name: 'Computer', money: 1500, position: 0, color: 'bg-blue-500', inJail: false, isComputer: true },
     ],
     activePlayerIndex: 0,
     turnCount: 1,
@@ -64,6 +65,36 @@ export const useGameStore = create<GameState>((set, get) => ({
             const d2 = Math.floor(Math.random() * 6) + 1;
             set({ dice: [d1, d2], isRolling: false, hasRolled: true });
             get().movePlayer(d1 + d2);
+
+            // Computer AI Logic
+            const { activePlayerIndex, players } = get();
+            const currentPlayer = players[activePlayerIndex];
+
+            if (currentPlayer.isComputer) {
+                setTimeout(() => {
+                    const { board, buyProperty, nextTurn, players: updatedPlayers, currentNews } = get();
+                    const p = updatedPlayers[activePlayerIndex];
+                    const tile = board[p.position];
+
+                    console.log(`[AI] ${p.name} landed on ${tile.name} (${tile.type})`);
+
+                    // Intelligent AI Buying decision
+                    if (tile.type === 'PROPERTY' && tile.id !== undefined) {
+                        const shouldBuy = shouldComputerBuy(p, tile, currentNews, board);
+                        if (shouldBuy) {
+                            console.log(`[AI] Decided to buy ${tile.name}`);
+                            buyProperty(tile.id);
+                        } else {
+                            console.log(`[AI] Decided NOT to buy ${tile.name}`);
+                        }
+                    }
+
+                    // End turn
+                    setTimeout(() => {
+                        nextTurn();
+                    }, 1500);
+                }, 1000);
+            }
         }, 600);
     },
 
@@ -97,11 +128,20 @@ export const useGameStore = create<GameState>((set, get) => ({
         // Debug mode: Trigger every turn
         triggerNews();
 
+        const nextIndex = (activePlayerIndex + 1) % players.length;
+
         set({
-            activePlayerIndex: (activePlayerIndex + 1) % players.length,
+            activePlayerIndex: nextIndex,
             turnCount: turnCount + 1,
             hasRolled: false
         });
+
+        // Trigger Computer Turn
+        if (players[nextIndex].isComputer) {
+            setTimeout(() => {
+                get().rollDice();
+            }, 1000);
+        }
     },
 
     triggerNews: async () => {
@@ -146,3 +186,49 @@ export const useGameStore = create<GameState>((set, get) => ({
         }
     }
 }));
+
+// Helper function for AI logic
+function shouldComputerBuy(player: Player, tile: Tile, currentNews: NewsEffect | null, board: Tile[]): boolean {
+    if (!tile.price || tile.owner !== undefined) return false;
+    if (player.money < tile.price) return false;
+
+    // Default strategy parameters
+    let reserve = 300; // Keep some cash on hand
+
+    // 1. News Response
+    if (currentNews) {
+        switch (currentNews.type) {
+            case 'RENT_HIKE':
+                reserve = 100; // Aggressive: rents are high, get land now!
+                break;
+            case 'PRICE_DROP':
+                reserve = 0; // Aggressive: buy the dip!
+                break;
+            case 'UTILITY_FAIL':
+                if (tile.group === 'utility') return false; // Avoid utilities
+                break;
+        }
+    }
+
+    // 2. Set Monopoly Strategy
+    // Check if we own other properties of the same group
+    if (tile.group) {
+        const groupProperties = board.filter(t => t.group === tile.group);
+        const ownedInGroup = groupProperties.filter(t => t.owner === player.id);
+
+        // If we already own something in this group, prioritize completing the set
+        // (ignoring reserve if we can afford it)
+        if (ownedInGroup.length > 0) {
+            return true;
+        }
+    }
+
+    // 3. Low Cost Strategy
+    // Always buy cheap properties if affordable
+    if (tile.price <= 200) {
+        return true;
+    }
+
+    // 4. Standard Decision based on Reserve
+    return (player.money - tile.price) >= reserve;
+}
