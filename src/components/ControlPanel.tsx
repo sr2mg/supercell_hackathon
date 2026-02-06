@@ -13,6 +13,7 @@ export function ControlPanel() {
         dice,
         rollDice,
         isRolling,
+        hasRolled,
         turnCount,
         nextTurn,
         currentNews, // kept for future use context
@@ -24,6 +25,7 @@ export function ControlPanel() {
         dice: state.dice,
         rollDice: state.rollDice,
         isRolling: state.isRolling,
+        hasRolled: state.hasRolled,
         turnCount: state.turnCount,
         nextTurn: state.nextTurn,
         currentNews: state.currentNews,
@@ -64,7 +66,7 @@ export function ControlPanel() {
             <div className="grid grid-cols-2 gap-2">
                 <button
                     onClick={rollDice}
-                    disabled={isRolling}
+                    disabled={isRolling || hasRolled}
                     className="col-span-2 bg-slate-900 text-white py-3 rounded-lg font-bold hover:bg-slate-800 disabled:opacity-50 transition-all flex items-center justify-center gap-2 shadow-sm"
                 >
                     {isRolling ? 'Rolling...' : 'ROLL DICE'}

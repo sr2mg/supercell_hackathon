@@ -26,6 +26,7 @@ interface GameState {
     isRolling: boolean;
     currentNews: NewsEffect | null;
     newsLog: NewsEffect[];
+    hasRolled: boolean;
 
     // Actions
     rollDice: () => void;
@@ -51,6 +52,7 @@ export const useGameStore = create<GameState>((set, get) => ({
     board: INITIAL_BOARD,
     dice: [1, 1],
     isRolling: false,
+    hasRolled: false,
     currentNews: null,
     newsLog: [],
 
@@ -60,7 +62,7 @@ export const useGameStore = create<GameState>((set, get) => ({
         setTimeout(() => {
             const d1 = Math.floor(Math.random() * 6) + 1;
             const d2 = Math.floor(Math.random() * 6) + 1;
-            set({ dice: [d1, d2], isRolling: false });
+            set({ dice: [d1, d2], isRolling: false, hasRolled: true });
             get().movePlayer(d1 + d2);
         }, 600);
     },
@@ -92,13 +94,13 @@ export const useGameStore = create<GameState>((set, get) => ({
     nextTurn: () => {
         const { activePlayerIndex, players, turnCount, triggerNews } = get();
         // Check if news should trigger
-        if ((turnCount + 1) % 3 === 0) {
-            triggerNews();
-        }
+        // Debug mode: Trigger every turn
+        triggerNews();
 
         set({
             activePlayerIndex: (activePlayerIndex + 1) % players.length,
-            turnCount: turnCount + 1
+            turnCount: turnCount + 1,
+            hasRolled: false
         });
     },
 
