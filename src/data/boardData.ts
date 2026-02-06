@@ -1,4 +1,4 @@
-export type TileType = 'PROPERTY' | 'CORNER' | 'NEWS' | 'CHANCE' | 'TAX';
+export type TileType = 'PROPERTY' | 'CORNER' | 'CHANCE' | 'TAX' | 'SPECIAL';
 
 export interface Tile {
   id: number;
@@ -6,41 +6,41 @@ export interface Tile {
   type: TileType;
   price?: number;
   rent?: number;
-  group?: string; // Color group: 'brown', 'blue', 'pink', 'orange', etc.
+  // Visual grouping (optional now, but good for UI)
+  group?: string;
   icon?: string;
-  owner?: number | null; // Player ID (0 or 1, etc)
+  owner?: number | null;
+  // New: specific game mechanic identifier
+  effect?: 'START_BONUS' | 'AI_LICENSING' | 'CRYPTO_VOLATILITY' | 'SKIP_TURN' | 'INFLUENCER_TAX' | 'INTEREST_TRAP' | 'BAILOUT' | 'REMOTE_SLOW' | 'GIG_LABOR' | 'BANKRUPTCY' | 'ENERGY_COST' | 'CONTENT_FLIP';
+  description?: string;
 }
 
 export const INITIAL_BOARD: Tile[] = [
-  // Bottom Row (Right to Left) -> 0 to 6
-  { id: 0, name: 'GO', type: 'CORNER', icon: 'ArrowRight' },
-  { id: 1, name: 'Crypto Kiosk', type: 'PROPERTY', price: 60, rent: 2, group: 'brown', icon: 'Bitcoin' },
-  { id: 2, name: 'Community Blog', type: 'CHANCE', icon: 'MessageCircle' },
-  { id: 3, name: 'Local Server', type: 'PROPERTY', price: 60, rent: 4, group: 'brown', icon: 'Server' },
-  { id: 4, name: 'Income Tax', type: 'TAX', price: 200, icon: 'DollarSign' },
-  { id: 5, name: 'Reading Rail', type: 'PROPERTY', price: 200, rent: 25, group: 'railroad', icon: 'Train' },
-  
-  // Left Row (Bottom to Top) -> 6 to 11
-  { id: 6, name: 'JAIL', type: 'CORNER', icon: 'Lock' },
-  { id: 7, name: 'Podcast Studio', type: 'PROPERTY', price: 100, rent: 6, group: 'pink', icon: 'Mic' },
-  { id: 8, name: 'NEWS ALERT', type: 'NEWS', icon: 'Radio' },
-  { id: 9, name: 'Streaming Hub', type: 'PROPERTY', price: 100, rent: 6, group: 'pink', icon: 'Video' },
-  { id: 10, name: 'Vlog Spot', type: 'PROPERTY', price: 120, rent: 8, group: 'pink', icon: 'Camera' },
-  { id: 11, name: 'Electric Co.', type: 'PROPERTY', price: 150, rent: 10, group: 'utility', icon: 'Zap' },
+  // Bottom Row (Right-to-Left): Indices 0 - 3
+  // 0: Bottom Right
+  { id: 0, name: 'START (Tax Haven)', type: 'CORNER', effect: 'START_BONUS', icon: 'Plane', description: '+$200. Beware of Tax Hikes.' },
+  { id: 1, name: 'AI Agent License', type: 'PROPERTY', price: 150, rent: 20, group: 'tech', effect: 'AI_LICENSING', icon: 'Bot' },
+  { id: 2, name: 'Crypto Wallet', type: 'SPECIAL', group: 'finance', effect: 'CRYPTO_VOLATILITY', icon: 'Bitcoin' },
+  { id: 3, name: 'CHANCE', type: 'CHANCE', icon: 'Siren' },
 
-  // Top Row (Left to Right) -> 12 to 17
-  { id: 12, name: 'NEWS ROOM', type: 'CORNER', icon: 'Globe' }, // "Free Parking" equivalent
-  { id: 13, name: 'Daily Paper', type: 'PROPERTY', price: 140, rent: 10, group: 'orange', icon: 'Newspaper' },
-  { id: 14, name: 'Print Press', type: 'PROPERTY', price: 140, rent: 10, group: 'orange', icon: 'Printer' },
-  { id: 15, name: 'Editorial Desk', type: 'PROPERTY', price: 160, rent: 12, group: 'orange', icon: 'Edit' },
-  { id: 16, name: 'Subway Station', type: 'PROPERTY', price: 200, rent: 25, group: 'railroad', icon: 'Train' },
-  { id: 17, name: 'Investigative Unit', type: 'PROPERTY', price: 180, rent: 14, group: 'red', icon: 'Search' },
+  // Left Row (Bottom-to-Top): Indices 4 - 7
+  // 4: Bottom Left
+  { id: 4, name: 'Layoff Lounge', type: 'CORNER', effect: 'SKIP_TURN', icon: 'Coffee', description: 'Skip next turn. No salary.' },
+  { id: 5, name: 'Influencer Tax', type: 'PROPERTY', price: 200, rent: 30, group: 'media', effect: 'INFLUENCER_TAX', icon: 'Instagram' },
+  { id: 6, name: 'Interest Rate Trap', type: 'TAX', effect: 'INTEREST_TRAP', icon: 'TrendingUp', description: 'Pay 10% of total cash.' },
+  { id: 7, name: 'CHANCE', type: 'CHANCE', icon: 'Siren' },
 
-  // Right Row (Top to Bottom) -> 18 to 23
-  { id: 18, name: 'GO TO JAIL', type: 'CORNER', icon: 'Siren' },
-  { id: 19, name: 'Tech Campus', type: 'PROPERTY', price: 220, rent: 18, group: 'red', icon: 'Cpu' },
-  { id: 20, name: 'Data Center', type: 'PROPERTY', price: 240, rent: 20, group: 'red', icon: 'Database' },
-  { id: 21, name: 'NEWS ALERT', type: 'NEWS', icon: 'Radio' },
-  { id: 22, name: 'Media Empire', type: 'PROPERTY', price: 350, rent: 35, group: 'blue', icon: 'Tv' },
-  { id: 23, name: 'Global Network', type: 'PROPERTY', price: 400, rent: 50, group: 'blue', icon: 'Globe2' },
+  // Top Row (Left-to-Right): Indices 8 - 11
+  // 8: Top Left
+  { id: 8, name: 'Gov Bailout', type: 'CORNER', effect: 'BAILOUT', icon: 'Landmark', description: 'Debt relief or free money.' },
+  { id: 9, name: 'Remote Work Hub', type: 'PROPERTY', price: 250, rent: 35, group: 'tech', effect: 'REMOTE_SLOW', icon: 'Wifi' },
+  { id: 10, name: 'Gig Platform', type: 'PROPERTY', price: 220, rent: 25, group: 'service', effect: 'GIG_LABOR', icon: 'Bike' },
+  { id: 11, name: 'CHANCE', type: 'CHANCE', icon: 'Siren' },
+
+  // Right Row (Top-to-Bottom): Indices 12 - 15
+  // 12: Top Right
+  { id: 12, name: 'Bankruptcy Ct.', type: 'CORNER', effect: 'BANKRUPTCY', icon: 'Gavel', description: 'Force sell highest asset.' },
+  { id: 13, name: 'Data Center', type: 'PROPERTY', price: 350, rent: 60, group: 'infra', effect: 'ENERGY_COST', icon: 'Server' },
+  { id: 14, name: 'Content IP', type: 'PROPERTY', price: 400, rent: 80, group: 'media', effect: 'CONTENT_FLIP', icon: 'Film' },
+  { id: 15, name: 'CHANCE', type: 'CHANCE', icon: 'Siren' },
 ];

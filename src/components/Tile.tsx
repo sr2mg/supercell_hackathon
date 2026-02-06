@@ -1,5 +1,5 @@
 import { Tile as TileType } from '@/data/boardData';
-import { User, Building2, HelpCircle, Siren, ArrowRight, Lock, Radio } from 'lucide-react';
+import { User, Building2, HelpCircle, Siren, ArrowRight, Lock, Radio, Plane, Bot, Bitcoin, Coffee, Instagram, TrendingUp, Landmark, Wifi, Bike, Gavel, Server, Film } from 'lucide-react';
 import { clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 
@@ -11,14 +11,15 @@ interface TileProps {
 
 export function Tile({ tile, playersOnTile, orientation = 'bottom' }: TileProps) {
     // Determine color bar color
+    // Determine color bar color
     const colorMap: Record<string, string> = {
-        brown: 'bg-amber-700',
+        tech: 'bg-cyan-500',
+        finance: 'bg-emerald-500',
+        media: 'bg-pink-500',
+        service: 'bg-orange-500',
+        infra: 'bg-slate-600',
+        brown: 'bg-amber-700', // Legacy fallback
         blue: 'bg-blue-600',
-        pink: 'bg-pink-500',
-        orange: 'bg-orange-500',
-        red: 'bg-red-600',
-        utility: 'bg-gray-400',
-        railroad: 'bg-slate-800'
     };
 
     const isCorner = tile.type === 'CORNER';
@@ -59,11 +60,25 @@ export function Tile({ tile, playersOnTile, orientation = 'bottom' }: TileProps)
 }
 
 function getLocationIcon(tile: TileType) {
-    if (tile.icon === 'ArrowRight') return <ArrowRight className="w-6 h-6 text-green-600" />;
-    if (tile.icon === 'Lock') return <Lock className="w-6 h-6 text-orange-600" />;
-    if (tile.icon === 'Globe') return <Building2 className="w-6 h-6 text-blue-600" />; // NewsRoom
-    if (tile.icon === 'Siren') return <Siren className="w-6 h-6 text-red-600" />;
-    if (tile.type === 'NEWS') return <Radio className="w-6 h-6 text-purple-600 animate-pulse" />;
+    // Special Icons via tile.icon string
+    switch (tile.icon) {
+        case 'Plane': return <Plane className="w-6 h-6 text-sky-600" />;
+        case 'Bot': return <Bot className="w-6 h-6 text-cyan-600" />;
+        case 'Bitcoin': return <Bitcoin className="w-6 h-6 text-yellow-500" />;
+        case 'Coffee': return <Coffee className="w-6 h-6 text-amber-800" />;
+        case 'Instagram': return <Instagram className="w-6 h-6 text-pink-600" />;
+        case 'TrendingUp': return <TrendingUp className="w-6 h-6 text-red-600" />;
+        case 'Landmark': return <Landmark className="w-6 h-6 text-slate-700" />;
+        case 'Wifi': return <Wifi className="w-6 h-6 text-blue-500" />;
+        case 'Bike': return <Bike className="w-6 h-6 text-green-600" />;
+        case 'Gavel': return <Gavel className="w-6 h-6 text-stone-700" />;
+        case 'Server': return <Server className="w-6 h-6 text-indigo-600" />;
+        case 'Film': return <Film className="w-6 h-6 text-purple-600" />;
+        case 'Siren': return <Siren className="w-6 h-6 text-red-600 animate-pulse" />;
+        case 'ArrowRight': return <ArrowRight className="w-6 h-6 text-green-600" />;
+        case 'Lock': return <Lock className="w-6 h-6 text-orange-600" />;
+    }
+
     if (tile.type === 'CHANCE') return <HelpCircle className="w-6 h-6 text-teal-600" />;
 
     return <Building2 className="w-4 h-4 text-slate-400" />;

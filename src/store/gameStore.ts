@@ -9,6 +9,7 @@ export interface Player {
     color: string;
     inJail: boolean;
     isComputer: boolean;
+    bankruptcy: boolean;
 }
 
 export interface NewsEffect {
@@ -28,13 +29,17 @@ interface GameState {
     currentNews: NewsEffect | null;
     newsLog: NewsEffect[];
     hasRolled: boolean;
+    winner: Player | null;
+    winningReason: string | null;
 
     // Actions
     rollDice: () => void;
     movePlayer: (steps: number) => void;
     nextTurn: () => void;
+    checkGameEnd: () => void;
     triggerNews: () => void;
     buyProperty: (tileId: number) => void;
+    resolveTileEffect: (tile: Tile, player: Player) => void;
 }
 
 const MOCK_NEWS: NewsEffect[] = [
@@ -45,8 +50,8 @@ const MOCK_NEWS: NewsEffect[] = [
 
 export const useGameStore = create<GameState>((set, get) => ({
     players: [
-        { id: 0, name: 'Player 1', money: 1500, position: 0, color: 'bg-red-500', inJail: false, isComputer: false },
-        { id: 1, name: 'Computer', money: 1500, position: 0, color: 'bg-blue-500', inJail: false, isComputer: true },
+        { id: 0, name: 'Player 1', money: 1500, position: 0, color: 'bg-red-500', inJail: false, isComputer: false, bankruptcy: false },
+        { id: 1, name: 'Computer', money: 1500, position: 0, color: 'bg-blue-500', inJail: false, isComputer: true, bankruptcy: false },
     ],
     activePlayerIndex: 0,
     turnCount: 1,
@@ -56,6 +61,8 @@ export const useGameStore = create<GameState>((set, get) => ({
     hasRolled: false,
     currentNews: null,
     newsLog: [],
+    winner: null,
+    winningReason: null,
 
     rollDice: () => {
         set({ isRolling: true });
@@ -115,10 +122,13 @@ export const useGameStore = create<GameState>((set, get) => ({
                 position: newPos
             };
             set({ players: updatedPlayers });
+            // New Position Tile handled below
+            get().resolveTileEffect(board[newPos], updatedPlayers[activePlayerIndex]);
         } else {
             const updatedPlayers = [...players];
             updatedPlayers[activePlayerIndex] = { ...player, position: newPos };
             set({ players: updatedPlayers });
+            get().resolveTileEffect(board[newPos], updatedPlayers[activePlayerIndex]);
         }
     },
 
@@ -128,6 +138,9 @@ export const useGameStore = create<GameState>((set, get) => ({
         // Debug mode: Trigger every turn
         triggerNews();
 
+        get().checkGameEnd();
+        if (get().winner) return; // Stop if game over
+
         const nextIndex = (activePlayerIndex + 1) % players.length;
 
         set({
@@ -135,6 +148,17 @@ export const useGameStore = create<GameState>((set, get) => ({
             turnCount: turnCount + 1,
             hasRolled: false
         });
+
+        if (players[nextIndex].inJail) {
+            const newerPlayers = [...get().players]; // Fetch fresh state just in case
+            newerPlayers[nextIndex].inJail = false; // Served time
+            set({ players: newerPlayers });
+            console.log(`Player ${players[nextIndex].name} is in Layoff/Jail. Skipping.`);
+            setTimeout(() => {
+                get().nextTurn();
+            }, 1500);
+            return;
+        }
 
         // Trigger Computer Turn
         if (players[nextIndex].isComputer) {
@@ -184,6 +208,95 @@ export const useGameStore = create<GameState>((set, get) => ({
             const newBoard = board.map(t => t.id === tileId ? { ...t, owner: player.id } : t);
             set({ players: newPlayers, board: newBoard });
         }
+    },
+
+    checkGameEnd: () => {
+        const { players, turnCount, board } = get();
+
+        // 1. Bankruptcy Check
+        const activePlayers = players.filter(p => p.money > 0 || !p.bankruptcy); // Simplified
+        if (activePlayers.length === 1) {
+            set({ winner: activePlayers[0], winningReason: "Last Entrepeneur Standing!" });
+            return;
+        }
+
+        // 2. Turn Limit (20 turns)
+        if (turnCount >= 20) {
+            // Calc assets
+            const getAssets = (p: Player) => {
+                const props = board.filter(t => t.owner === p.id);
+                const propValue = props.reduce((acc, t) => acc + (t.price || 0), 0);
+                return p.money + propValue;
+            };
+
+            const sorted = [...players].sort((a, b) => getAssets(b) - getAssets(a));
+            set({ winner: sorted[0], winningReason: "Market Leader (20 Turns)" });
+            return;
+        }
+
+        // 3. Wealth Goal ($5000)
+        const wealthy = players.find(p => {
+            const props = board.filter(t => t.owner === p.id);
+            const assets = p.money + props.reduce((acc, t) => acc + (t.price || 0), 0);
+            return assets >= 5000;
+        });
+
+        if (wealthy) {
+            set({ winner: wealthy, winningReason: "Unicorn Status Achieved ($5k Assets)" });
+        }
+    },
+
+    resolveTileEffect: (tile, player) => {
+        const { players, board } = get(); // Use updated state
+        // Helper to update player
+        const updatePlayer = (p: Player, updates: Partial<Player>) => {
+            const currentPlayers = get().players;
+            const newPlayers = currentPlayers.map(pl => pl.id === p.id ? { ...pl, ...updates } : pl);
+            set({ players: newPlayers });
+        };
+
+        console.log(`Resolving effect ${tile.effect || tile.type} for ${player.name}`);
+
+        switch (tile.effect) {
+            case 'SKIP_TURN':
+                updatePlayer(player, { inJail: true });
+                break;
+            case 'INTEREST_TRAP':
+                const interest = Math.floor(player.money * 0.1);
+                updatePlayer(player, { money: player.money - interest });
+                break;
+            case 'BAILOUT':
+                // Debt relief or small grant
+                if (player.money < 0) {
+                    updatePlayer(player, { money: 0 });
+                } else {
+                    updatePlayer(player, { money: player.money + 100 });
+                }
+                break;
+            case 'BANKRUPTCY':
+                // Sell highest asset
+                const owned = board.filter(t => t.owner === player.id);
+                if (owned.length > 0) {
+                    const mostExpensive = owned.sort((a, b) => (b.price || 0) - (a.price || 0))[0];
+                    const sellPrice = Math.floor((mostExpensive.price || 0) * 0.5); // Fire sale
+
+                    const newBoard = board.map(t => t.id === mostExpensive.id ? { ...t, owner: null, ownerName: undefined } : t);
+
+                    // Update player money
+                    const currentPlayers = get().players;
+                    const newPlayers = currentPlayers.map(pl => pl.id === player.id ? { ...pl, money: pl.money + sellPrice } : pl);
+
+                    set({ board: newBoard, players: newPlayers });
+                    console.log(`Bankruptcy Court: Sold ${mostExpensive.name} for ${sellPrice}`);
+                }
+                break;
+            case 'CRYPTO_VOLATILITY':
+                // Random +/-
+                const change = Math.floor(Math.random() * 200) - 100;
+                updatePlayer(player, { money: player.money + change });
+                break;
+            // Other cases (START_BONUS handled by movePlayer, etc)
+        }
     }
 }));
 
@@ -205,7 +318,8 @@ function shouldComputerBuy(player: Player, tile: Tile, currentNews: NewsEffect |
                 reserve = 0; // Aggressive: buy the dip!
                 break;
             case 'UTILITY_FAIL':
-                if (tile.group === 'utility') return false; // Avoid utilities
+                // No utilities anymore, just generic caution
+                reserve = 500;
                 break;
         }
     }
