@@ -3,6 +3,7 @@
 import { Board } from "@/components/Board";
 import { ControlPanel } from "@/components/ControlPanel";
 import { NewsTicker } from "@/components/NewsTicker";
+import { ResultModal } from "@/components/ResultModal";
 import { HowToPlay } from "@/components/HowToPlay";
 import { useGameStore } from "@/store/gameStore";
 import { useEffect, useState } from "react";
@@ -10,6 +11,10 @@ import { useEffect, useState } from "react";
 export default function Home() {
   const isNewsReady = useGameStore(state => state.isNewsReady);
   const fetchNews = useGameStore(state => state.fetchNews);
+  const winner = useGameStore(state => state.winner);
+  const winningReason = useGameStore(state => state.winningReason);
+  const players = useGameStore(state => state.players);
+  const board = useGameStore(state => state.board);
   const [hasStarted, setHasStarted] = useState(false);
 
   // Prefetch news on mount
@@ -77,6 +82,14 @@ export default function Home() {
           </div>
         </div>
       </div>
+      {winner && (
+        <ResultModal
+          winner={winner}
+          winningReason={winningReason}
+          players={players}
+          board={board}
+        />
+      )}
     </main>
   );
 }
