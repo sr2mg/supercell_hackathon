@@ -1,5 +1,5 @@
-import { Tile as TileType } from '@/data/boardData';
-import { User, Building2, HelpCircle, Siren, ArrowRight, Lock, Radio, Plane, Bot, Bitcoin, Coffee, Instagram, TrendingUp, Landmark, Wifi, Bike, Gavel, Server, Film } from 'lucide-react';
+import { Asset as TileType, Tag } from '@/data/boardData';
+import { Building2, Siren, ArrowRight, Plane, Bot, Bitcoin, Instagram, TrendingUp, Landmark, Wifi, Bike, Gavel, Server, Film } from 'lucide-react';
 import { clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 
@@ -12,18 +12,22 @@ interface TileProps {
 export function Tile({ tile, playersOnTile, orientation = 'bottom' }: TileProps) {
     // Determine color bar color
     // Determine color bar color
-    const colorMap: Record<string, string> = {
-        tech: 'bg-cyan-500',
-        finance: 'bg-emerald-500',
-        media: 'bg-pink-500',
-        service: 'bg-orange-500',
-        infra: 'bg-slate-600',
-        brown: 'bg-amber-700', // Legacy fallback
-        blue: 'bg-blue-600',
+    const colorMap: Record<Tag, string> = {
+        AI: 'bg-cyan-500',
+        CHIPS: 'bg-indigo-500',
+        ENERGY: 'bg-amber-500',
+        GOV: 'bg-slate-500',
+        CRYPTO: 'bg-yellow-500',
+        MEDIA: 'bg-pink-500',
     };
 
-    const isCorner = tile.type === 'CORNER';
-    const bgColor = isCorner ? 'bg-slate-100' : 'bg-white';
+    const bgColor = tile.isPayday ? 'bg-slate-100' : 'bg-white';
+    const playerColors: Record<number, string> = {
+        0: 'bg-red-500',
+        1: 'bg-blue-500',
+        2: 'bg-green-500',
+        3: 'bg-yellow-500',
+    };
 
     return (
         <div className={twMerge(
@@ -33,15 +37,15 @@ export function Tile({ tile, playersOnTile, orientation = 'bottom' }: TileProps)
             "aspect-square w-full h-full"
         )}>
             {/* Property Color Bar */}
-            {tile.group && !isCorner && (
-                <div className={clsx("w-full h-1/4 absolute top-0 left-0", colorMap[tile.group] || 'bg-gray-200')} />
+            {!tile.isPayday && (
+                <div className={clsx("w-full h-1/4 absolute top-0 left-0", colorMap[tile.tag] || 'bg-gray-200')} />
             )}
 
             {/* Content */}
-            <div className={clsx("flex flex-col items-center justify-center w-full h-full z-10 px-0.5", tile.group ? "pt-3 md:pt-4" : "")}>
+            <div className={clsx("flex flex-col items-center justify-center w-full h-full z-10 px-0.5", !tile.isPayday ? "pt-3 md:pt-4" : "")}>
                 {getLocationIcon(tile)}
                 <span className="text-center font-bold mt-0.5 md:mt-1 leading-none text-[8px] md:text-[10px] lg:text-xs text-slate-800 break-words w-full overflow-hidden text-ellipsis line-clamp-2 md:line-clamp-none">{tile.name}</span>
-                {tile.price && <span className="text-slate-500 font-mono text-[8px] md:text-[10px]">${tile.price}</span>}
+                {!tile.isPayday && <span className="text-slate-500 font-mono text-[8px] md:text-[10px]">D {tile.dividend}</span>}
             </div>
 
             {/* Players */}
@@ -51,9 +55,19 @@ export function Tile({ tile, playersOnTile, orientation = 'bottom' }: TileProps)
                 ))}
             </div>
 
-            {/* Owner Marker */}
-            {tile.owner !== undefined && tile.owner !== null && (
-                <div className={clsx("absolute top-1 right-1 w-2 h-2 rounded-full", tile.owner === 0 ? 'bg-red-500' : 'bg-blue-500')} />
+            {/* Shareholders */}
+            {tile.shareholders.length > 0 && (
+                <div className="absolute top-1 right-1 flex gap-0.5">
+                    {tile.shareholders.flatMap(h => (
+                        Array.from({ length: h.shares }).map((_, i) => (
+                            <div
+                                key={`${h.playerId}-${i}`}
+                                className={clsx("w-2 h-2 rounded-full", playerColors[h.playerId] || 'bg-slate-400')}
+                                title={`Player ${h.playerId}`}
+                            />
+                        ))
+                    ))}
+                </div>
             )}
         </div>
     );
@@ -79,7 +93,7 @@ function getLocationIcon(tile: TileType) {
         case 'Lock': return <Lock className="w-6 h-6 text-orange-600" />;
     }
 
-    if (tile.type === 'CHANCE') return <HelpCircle className="w-6 h-6 text-teal-600" />;
+    if (tile.isPayday) return <ArrowRight className="w-6 h-6 text-green-600" />;
 
     return <Building2 className="w-4 h-4 text-slate-400" />;
 }
