@@ -37,7 +37,11 @@ interface GameState {
     nextTurn: () => void;
     checkGameEnd: () => void;
     triggerNews: () => void;
-    fetchNews: () => Promise<void>;
+    fetchNews: (options?: {
+        mode?: 'initial' | 'fill';
+        initialCount?: number;
+        chunkSize?: number;
+    }) => Promise<void>;
     buyShare: (assetId: number) => void;
     sellShare: (assetId: number, amount?: number) => void;
     resolveTileEffect: (tile: Asset, player: Player) => void;
@@ -187,7 +191,7 @@ export const useGameStore = create<GameState>((set, get) => ({
 
         // Refill if getting low (background fetch)
         if (newsQueue.length < 5) {
-            get().fetchNews();
+            get().fetchNews({ mode: 'fill' });
         }
 
         const fallbackNews = newsQueue.length > 0 ? newsQueue[0] : MOCK_NEWS[0];
@@ -291,13 +295,38 @@ export const useGameStore = create<GameState>((set, get) => ({
         }));
     },
 
-    fetchNews: async () => {
+    fetchNews: async (options) => {
+        const mode = options?.mode ?? 'fill';
+        const initialCount = options?.initialCount ?? 5;
+        const chunkSize = options?.chunkSize ?? 5;
+
+        const enqueueInChunks = (items: NewsCard[], size: number) => {
+            if (items.length === 0) return;
+            const chunk = items.slice(0, size);
+            const rest = items.slice(size);
+            set(state => ({ newsQueue: [...state.newsQueue, ...chunk] }));
+            if (rest.length > 0) {
+                setTimeout(() => enqueueInChunks(rest, size), 300);
+            }
+        };
+
         try {
-            const res = await fetch('/api/news');
+            const res = await fetch(`/api/news?mode=${mode}`);
             const data = await res.json();
 
             // Validate it's an array
             const newItems = Array.isArray(data) ? data : [];
+
+            if (mode === 'initial') {
+                const initialItems = newItems.slice(0, initialCount);
+                const remaining = newItems.slice(initialCount);
+                set(state => ({
+                    newsQueue: [...state.newsQueue, ...initialItems],
+                    isNewsReady: true
+                }));
+                enqueueInChunks(remaining, chunkSize);
+                return;
+            }
 
             set(state => ({
                 newsQueue: [...state.newsQueue, ...newItems],
@@ -307,6 +336,17 @@ export const useGameStore = create<GameState>((set, get) => ({
             console.error("Failed to fetch news", err);
             // Fallback
             console.warn("Using mock news as fallback");
+            if (mode === 'initial') {
+                const initialItems = MOCK_NEWS.slice(0, initialCount);
+                const remaining = MOCK_NEWS.slice(initialCount);
+                set(state => ({
+                    newsQueue: [...state.newsQueue, ...initialItems],
+                    isNewsReady: true
+                }));
+                enqueueInChunks(remaining, chunkSize);
+                return;
+            }
+
             set(state => ({
                 newsQueue: [...state.newsQueue, ...MOCK_NEWS],
                 isNewsReady: true

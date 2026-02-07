@@ -13,7 +13,7 @@ export default function Home() {
 
   // Prefetch news on mount
   useEffect(() => {
-    fetchNews();
+    fetchNews({ mode: 'initial', initialCount: 1, chunkSize: 5 });
   }, [fetchNews]);
 
   if (!isNewsReady) {

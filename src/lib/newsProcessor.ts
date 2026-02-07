@@ -55,6 +55,7 @@ function shuffleArray<T>(array: T[]): T[] {
 }
 
 export async function processNewsItems(rawNews: any[]): Promise<NewsCard[]> {
+    console.time('[news] processNewsItems');
     // Split into batches for parallel processing
     const batches: any[][] = [];
     for (let i = 0; i < rawNews.length; i += BATCH_SIZE) {
@@ -70,10 +71,12 @@ export async function processNewsItems(rawNews: any[]): Promise<NewsCard[]> {
 
     // Flatten results and shuffle
     const allNews = batchResults.flat();
+    console.timeEnd('[news] processNewsItems');
     return shuffleArray(allNews);
 }
 
 async function processBatch(batchNews: any[], startIndex: number): Promise<NewsCard[]> {
+    console.time(`[news] batch-${startIndex}`);
     const newsInput = batchNews.map((item: any) => ({
         title: item.title,
         description: item.description?.substring(0, 200) || '',
@@ -95,7 +98,7 @@ async function processBatch(batchNews: any[], startIndex: number): Promise<NewsC
         const processedItems = JSON.parse(cleanedText);
 
         // Map to full NewsCard structure (add IDs)
-        return processedItems.map((item: any, index: number) => ({
+        const mapped = processedItems.map((item: any, index: number) => ({
             id: `news-${Date.now()}-${startIndex + index}`,
             sourceTitle: item.sourceTitle || batchNews[index]?.title || 'Unknown Source',
             type: asNewsType(item.type),
@@ -106,9 +109,12 @@ async function processBatch(batchNews: any[], startIndex: number): Promise<NewsC
             direction: asDirection(item.direction),
             url: batchNews[index]?.link || undefined
         }));
+        console.timeEnd(`[news] batch-${startIndex}`);
+        return mapped;
 
     } catch (error) {
         console.error(`Batch processing error (starting at ${startIndex}):`, error);
+        console.timeEnd(`[news] batch-${startIndex}`);
         return [];
     }
 }
