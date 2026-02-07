@@ -2,6 +2,7 @@ import { Asset as TileType, Tag } from '@/data/boardData';
 import { Building2, Siren, ArrowRight, Plane, Bot, Bitcoin, Instagram, TrendingUp, Landmark, Wifi, Bike, Gavel, Server, Film, Coffee, Lock } from 'lucide-react';
 import { clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
+import { PlayerToken } from './PlayerToken';
 
 interface TileProps {
     tile: TileType;
@@ -23,10 +24,10 @@ export function Tile({ tile, playersOnTile, orientation = 'bottom' }: TileProps)
 
     const bgColor = tile.isPayday ? 'bg-slate-100' : 'bg-white';
     const playerColors: Record<number, string> = {
-        0: 'bg-red-500',
-        1: 'bg-blue-500',
-        2: 'bg-green-500',
-        3: 'bg-yellow-500',
+        0: '#F5D304',
+        1: '#FDA3F5',
+        2: '#00E16D',
+        3: '#07A5E2',
     };
 
     return (
@@ -62,10 +63,14 @@ export function Tile({ tile, playersOnTile, orientation = 'bottom' }: TileProps)
             </div>
 
             {/* Players */}
-            <div className="absolute bottom-1 flex gap-1 z-20">
-                {playersOnTile.map(p => (
-                    <div key={p.id} className={clsx("w-3 h-3 rounded-full shadow-sm ring-1 ring-white", p.color)} title={p.name} />
-                ))}
+            <div className="absolute bottom-0 left-0 right-0 flex justify-center z-20">
+                <div className="flex -space-x-2">
+                    {playersOnTile.map(p => (
+                        <div key={p.id} className="relative w-8 h-8 transition-transform hover:z-30 hover:scale-110 drop-shadow-md">
+                            <PlayerToken color={p.color} />
+                        </div>
+                    ))}
+                </div>
             </div>
 
             {/* Shareholders */}
@@ -75,7 +80,8 @@ export function Tile({ tile, playersOnTile, orientation = 'bottom' }: TileProps)
                         Array.from({ length: h.shares }).map((_, i) => (
                             <div
                                 key={`${h.playerId}-${i}`}
-                                className={clsx("w-2 h-2 rounded-full", playerColors[h.playerId] || 'bg-slate-400')}
+                                className="w-2 h-2 rounded-full border border-black/10"
+                                style={{ backgroundColor: playerColors[h.playerId] || '#94a3b8' }}
                                 title={`Player ${h.playerId}`}
                             />
                         ))

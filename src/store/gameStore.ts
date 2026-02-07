@@ -79,10 +79,10 @@ function runComputerTurn(get: () => GameState, activePlayerIndex: number) {
 
 export const useGameStore = create<GameState>((set, get) => ({
     players: [
-        { id: 0, name: 'Human', money: 10000, position: 0, color: 'bg-red-500', isComputer: false, isAlive: true },
-        { id: 1, name: 'CPU 1', money: 10000, position: 0, color: 'bg-blue-500', isComputer: true, isAlive: true },
-        { id: 2, name: 'CPU 2', money: 10000, position: 0, color: 'bg-green-500', isComputer: true, isAlive: true },
-        { id: 3, name: 'CPU 3', money: 10000, position: 0, color: 'bg-yellow-500', isComputer: true, isAlive: true },
+        { id: 0, name: 'Human', money: 10000, position: 0, color: '#F5D304', isComputer: false, isAlive: true },
+        { id: 1, name: 'CPU 1', money: 10000, position: 0, color: '#FDA3F5', isComputer: true, isAlive: true },
+        { id: 2, name: 'CPU 2', money: 10000, position: 0, color: '#00E16D', isComputer: true, isAlive: true },
+        { id: 3, name: 'CPU 3', money: 10000, position: 0, color: '#07A5E2', isComputer: true, isAlive: true },
     ],
     activePlayerIndex: 0,
     turnCount: 1,

@@ -65,7 +65,10 @@ export function ControlPanel() {
                 </div>
                 <div className="text-right">
                     <div className="text-sm text-slate-500">Current Player</div>
-                    <div className={`font-bold ${activePlayer.id === 0 ? 'text-red-600' : 'text-blue-600'}`}>{activePlayer.name}</div>
+                    <div className="font-bold text-slate-800 flex items-center justify-end gap-2">
+                        <span>{activePlayer.name}</span>
+                        <div className="w-3 h-3 rounded-full border border-black/10 shadow-sm" style={{ backgroundColor: activePlayer.color }} />
+                    </div>
                 </div>
             </div>
 
@@ -185,7 +188,7 @@ export function ControlPanel() {
                         )}>
                             <div className="flex justify-between items-center">
                                 <div className="flex items-center gap-2">
-                                    <div className={`w-3 h-3 rounded-full ${p.color}`} />
+                                    <div className="w-3 h-3 rounded-full shadow-sm border border-black/10" style={{ backgroundColor: p.color }} />
                                     <span className="text-sm font-medium">{p.name}</span>
                                 </div>
                                 <div className="font-mono text-sm font-semibold">${playerNetWorth}</div>
