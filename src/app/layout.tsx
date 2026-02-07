@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Rammetto_One, Inter, Bebas_Neue } from "next/font/google";
+import { Rammetto_One, Inter, Bebas_Neue, Lilita_One } from "next/font/google";
 import "./globals.css";
 
 const rammettoOne = Rammetto_One({
@@ -19,6 +19,12 @@ const bebasNeue = Bebas_Neue({
   subsets: ["latin"],
 });
 
+const lilitaOne = Lilita_One({
+  weight: "400",
+  variable: "--font-lilita-one",
+  subsets: ["latin"],
+});
+
 export const metadata: Metadata = {
   title: "Newsopoly",
   description: "A news-based board game",
@@ -32,7 +38,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${rammettoOne.variable} ${inter.variable} ${bebasNeue.variable} antialiased`}
+        className={`${rammettoOne.variable} ${inter.variable} ${bebasNeue.variable} ${lilitaOne.variable} antialiased`}
         suppressHydrationWarning
       >
         {children}

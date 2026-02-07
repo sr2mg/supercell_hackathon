@@ -32,63 +32,119 @@ export function KomaTile({
         <div className={clsx(
             "relative select-none",
             "aspect-square w-full h-full"
-        )}>
+        )}
+            style={{ fontFamily: 'var(--font-lilita-one)' }}
+        >
             <svg
                 viewBox="0 0 300 300"
                 className="absolute inset-0 w-full h-full"
                 preserveAspectRatio="xMidYMid meet"
+                xmlns="http://www.w3.org/2000/svg"
             >
-                {/* Color background (same size as koma.svg) */}
+                {/* Background & Border */}
                 <rect x="2.5" y="2.5" width="295" height="295" fill={colorHex} />
+                <rect x="2.5" y="2.5" width="295" height="295" stroke="black" strokeWidth="5" fill="none" />
 
-                {/* Base frame/pill/circles */}
-                <image href="/koma.svg" x="0" y="0" width="300" height="300" />
+                {/* Bottom White Box */}
+                <rect x="5" y="179" width="290" height="116" fill="white" />
 
-                {/* Title */}
-                <text x="22" y="110" fontFamily="Lilita One, sans-serif" fontSize="20" fill="black">
+                {/* Name */}
+                <text
+                    x="22"
+                    y="110"
+                    className="fill-black text-6xl tracking-tight uppercase"
+                    style={{ fontFamily: 'var(--font-lilita-one)', fontSize: '50px' }}
+                >
                     {name}
                 </text>
 
-                {/* Tag text (inside pill) */}
-                <text x="40" y="148" fontFamily="Lilita One, sans-serif" fontSize="12" fill="black">
+                {/* Tag Pill */}
+                <rect x="22" y="127" width="115" height="31" rx="15.5" stroke="black" strokeWidth="4" fill="none" />
+
+                {/* Tag Text */}
+                <text
+                    x="79.5" // 22 + 115/2
+                    y="149" // 127 + 31/2 + adjustment
+                    textAnchor="middle"
+                    className="fill-black text-xl uppercase tracking-wider"
+                    style={{ fontFamily: 'var(--font-lilita-one)', fontSize: '18px', fontWeight: 'bold' }}
+                >
                     {tag}
                 </text>
 
-                {/* Price */}
-                <text x="68" y="260" fontFamily="Lilita One, sans-serif" fontSize="32" fill="black">$</text>
+                {/* Price/Value */}
+                {/* Dollar Sign */}
                 <text
-                    x="98"
-                    y="265"
-                    fontFamily="Lilita One, sans-serif"
-                    fontSize="50"
-                    fill="black"
-                    letterSpacing="10%"
+                    x="30"
+                    y="270"
+                    className="fill-black"
+                    style={{ fontFamily: 'var(--font-lilita-one)', fontSize: '50px' }}
+                >
+                    $
+                </text>
+                {/* Value amount */}
+                <text
+                    x="65"
+                    y="270"
+                    className="fill-black"
+                    style={{ fontFamily: 'var(--font-lilita-one)', fontSize: '70px', letterSpacing: '0.05em' }}
                 >
                     {value}
                 </text>
+
+                {/* Slot Circles */}
+                <circle cx="169.5" cy="142.5" r="15.5" fill="white" stroke="black" strokeWidth="4" />
+                <circle cx="214.5" cy="142.5" r="15.5" fill="white" stroke="black" strokeWidth="4" />
+                <circle cx="258.5" cy="142.5" r="15.5" fill="white" stroke="black" strokeWidth="4" />
             </svg>
 
-            {/* Players */}
-            <div className="absolute bottom-1 left-0 right-0 flex justify-center z-20">
-                {playersOnTile.map(p => (
-                    <div key={p.id} className={clsx("w-3 h-3 rounded-full shadow-sm ring-1 ring-white", p.color)} title={p.name} />
-                ))}
+            {/* Shareholders (Using the slot circles positions) */}
+            {/* The SVG circles are at specific coords, we can place absolute divs over them or render SVG circles inside */}
+            {/* Let's render shareholder markers inside the SVG if possible, or overlay divs. */}
+            {/* Overlay Divs for Shareholders */}
+            <div className="absolute top-0 left-0 w-full h-full pointer-events-none">
+                {/* Map slots to shareholders based on index (max 3 slots shown efficiently) */}
+                {/* Slots: (169.5, 142.5), (214.5, 142.5), (258.5, 142.5) */}
+                {/* Convert SVG coords to percentages for responsiveness: 300x300 basis */}
+                {shareholders.slice(0, 3).map((h, i) => {
+                    const cx = [169.5, 214.5, 258.5][i];
+                    const cy = 142.5;
+                    const left = (cx / 300) * 100;
+                    const top = (cy / 300) * 100;
+
+                    return (
+                        <div
+                            key={`sh-${i}`}
+                            className={clsx(
+                                "absolute w-[8%] h-[8%] rounded-full border-2 border-black transform -translate-x-1/2 -translate-y-1/2 flex items-center justify-center",
+                                playerColors[h.playerId] || 'bg-gray-400'
+                            )}
+                            style={{ left: `${left}%`, top: `${top}%` }}
+                            title={`Shareholder: Player ${h.playerId} (${h.shares})`}
+                        >
+                            {/* Optional: Show share count if tiny text fits, or just color indicator */}
+                            {/* <span className="text-[0.4em] font-bold text-black">{h.shares}</span> */}
+                        </div>
+                    );
+                })}
             </div>
 
-            {/* Shareholders */}
-            {shareholders.length > 0 && (
-                <div className="absolute top-1 right-1 flex gap-0.5">
-                    {shareholders.flatMap(h => (
-                        Array.from({ length: h.shares }).map((_, i) => (
-                            <div
-                                key={`${h.playerId}-${i}`}
-                                className={clsx("w-2 h-2 rounded-full", playerColors[h.playerId] || 'bg-slate-400')}
-                                title={`Player ${h.playerId}`}
-                            />
-                        ))
-                    ))}
-                </div>
-            )}
+            {/* Players on Tile (Standing) */}
+            {/* Position them at bottom right or spread out? SVG has space at bottom right in white box? */}
+            {/* The white box is huge (y=179 to 295). Enough space for players. */}
+            {/* Let's put players at bottom right area to avoid obscuring price too much. */}
+            <div className="absolute bottom-[5%] right-[5%] flex flex-col-reverse gap-1 items-end z-20">
+                {playersOnTile.map(p => (
+                    <div
+                        key={p.id}
+                        className={clsx(
+                            "w-6 h-6 rounded-full border-2 border-black shadow-lg", // Larger player tokens
+                            p.color
+                        )}
+                        title={p.name}
+                    />
+                ))}
+            </div>
         </div>
     );
 }
