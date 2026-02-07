@@ -191,7 +191,7 @@ export const useGameStore = create<GameState>((set, get) => ({
         let { newsQueue, turnCount } = get();
 
         // Refill if getting low (background fetch)
-        if (newsQueue.length < 5) {
+        if (newsQueue.length < 15) {
             get().fetchNews({ mode: 'fill' });
         }
 

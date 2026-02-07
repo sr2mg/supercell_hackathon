@@ -42,8 +42,8 @@ export async function GET(request: Request) {
             throw new Error('Invalid RSS structure');
         }
 
-        // Take top 10 items for processing
-        const topStories = items.slice(0, 10);
+        // Take top 20 items for processing
+        const topStories = items.slice(0, 20);
         cachedRaw = topStories;
 
         const { searchParams } = new URL(request.url);
