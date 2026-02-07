@@ -98,12 +98,12 @@ export function ControlPanel() {
 
                                 // Map tags to specific colors based on the design
                                 const tagColors: Record<Tag, string> = {
-                                    MEDIA: '#FF9F1C', // Orange
-                                    AI: '#FF99C8',    // Pink
-                                    ENERGY: '#FFD700',// Yellow
-                                    CRYPTO: '#00FA9A',// Green
-                                    CHIPS: '#C7A3E6', // Purple 
-                                    GOV: '#00BFFF',   // Blue
+                                    AI: '#07A5E2',
+                                    CHIPS: '#F5D304',
+                                    ENERGY: '#F99408',
+                                    GOV: '#B586DF',
+                                    CRYPTO: '#00E16D',
+                                    MEDIA: '#FDA3F5',
                                 };
 
                                 const displayTag = tag === 'CRYPTO' ? 'CRYPT' : tag;
@@ -154,7 +154,16 @@ export function ControlPanel() {
                                                 <div className="flex items-center gap-2">
                                                     <div
                                                         className="w-4 h-4 rounded-full border border-black"
-                                                        style={{ backgroundColor: h.tag === 'AI' ? '#FDA3F5' : h.tag === 'CHIPS' ? '#00E16D' : h.tag === 'ENERGY' ? '#F5D304' : '#07A5E2' }}
+                                                        style={{
+                                                            backgroundColor: {
+                                                                AI: '#07A5E2',
+                                                                CHIPS: '#F5D304',
+                                                                ENERGY: '#F99408',
+                                                                GOV: '#B586DF',
+                                                                CRYPTO: '#00E16D',
+                                                                MEDIA: '#FDA3F5',
+                                                            }[h.tag] || '#E5E7EB'
+                                                        }}
                                                     />
                                                     <span className="truncate max-w-[140px] uppercase text-black">{h.name}</span>
                                                 </div>
