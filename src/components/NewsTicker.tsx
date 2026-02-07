@@ -47,8 +47,8 @@ export function NewsTicker() {
         <>
             {visible && (
                 <div className="fixed inset-0 z-50 flex items-end justify-center pb-6 md:pb-10">
-                    <div className="absolute inset-0 bg-black/60" />
-                    <div className="relative w-full px-4">
+                    <div className="absolute inset-0 bg-black/60 news-overlay" />
+                    <div className="relative w-full px-4 news-cutin">
                         <NewsBlock
                             title={activeNews.title || activeNews.sourceTitle || 'News'}
                             subtitle={activeNews.titleEn || null}

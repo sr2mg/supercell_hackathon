@@ -68,6 +68,7 @@ export function Tile({ tile, playersOnTile, orientation = 'bottom' }: TileProps)
             playersOnTile={playersOnTile}
             playerColors={playerColors}
             previousPrice={tile.previousPrice}
+            highlight={tile.previousDividend !== undefined && tile.previousDividend !== tile.dividend}
         />
     );
 }

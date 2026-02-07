@@ -59,7 +59,7 @@ export function Board() {
                     };
 
                     return (
-                        <div key={tile.id} style={style} className="w-full h-full overflow-hidden">
+                        <div key={`${tile.id}-${tile.dividend}-${tile.previousDividend ?? 0}`} style={style} className="w-full h-full overflow-hidden">
                             <Tile tile={tile} playersOnTile={getPlayersOnTile(tile.id)} />
                         </div>
                     );

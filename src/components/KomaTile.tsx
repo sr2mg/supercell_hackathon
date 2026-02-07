@@ -9,6 +9,7 @@ interface KomaTileProps {
     value: number;
     price: number;
     colorHex: string;
+    highlight?: boolean;
     shareholders?: Array<{ playerId: number; shares: number }>;
     playersOnTile?: Player[];
     playerColors?: Record<number, string>;
@@ -28,6 +29,7 @@ export function KomaTile({
     value,
     price,
     colorHex,
+    highlight = false,
     shareholders = [],
     playersOnTile = [],
     playerColors = defaultPlayerColors,
@@ -54,10 +56,23 @@ export function KomaTile({
         >
             <svg
                 viewBox="0 0 300 300"
-                className="absolute inset-0 w-full h-full"
+                className={clsx(
+                    "absolute inset-0 w-full h-full",
+                    highlight && "koma-impact-svg"
+                )}
                 preserveAspectRatio="xMidYMid meet"
                 xmlns="http://www.w3.org/2000/svg"
             >
+                {highlight && (
+                    <rect
+                        x="6"
+                        y="6"
+                        width="288"
+                        height="288"
+                        rx="6"
+                        className="koma-impact-ring"
+                    />
+                )}
                 {/* Background & Border */}
                 <rect x="2.5" y="2.5" width="295" height="295" fill={colorHex} />
                 <rect x="2.5" y="2.5" width="295" height="295" stroke="black" strokeWidth="5" fill="none" />
