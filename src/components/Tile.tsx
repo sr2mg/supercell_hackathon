@@ -39,7 +39,7 @@ export function Tile({ tile, playersOnTile, orientation = 'bottom' }: TileProps)
                 />
 
                 {/* Players on Tile (similar to KomaTile) */}
-                <div className="absolute bottom-[5%] right-[5%] flex flex-col-reverse gap-1 items-end z-20">
+                <div className="absolute top-[5%] right-[5%] flex flex-col gap-1 items-end z-20">
                     {playersOnTile.map(p => (
                         <div
                             key={p.id}

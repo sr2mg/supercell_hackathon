@@ -156,7 +156,7 @@ export function KomaTile({
             {/* Position them at bottom right or spread out? SVG has space at bottom right in white box? */}
             {/* The white box is huge (y=179 to 295). Enough space for players. */}
             {/* Let's put players at bottom right area to avoid obscuring price too much. */}
-            <div className="absolute bottom-[5%] right-[5%] flex flex-col-reverse gap-1 items-end z-20">
+            <div className="absolute top-[5%] right-[5%] flex flex-col gap-1 items-end z-20">
                 {playersOnTile.map(p => (
                     <div
                         key={p.id}

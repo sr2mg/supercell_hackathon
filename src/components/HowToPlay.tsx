@@ -19,8 +19,8 @@ export function HowToPlay() {
             <ul className="space-y-2 list-disc pl-6 text-xs leading-tight">
                 <li>Roll dice to move around the loop.</li>
                 <li>Every 3 turns, <strong>World News</strong> changes property values or rents.</li>
-                <li>Buy properties to bankrupt your opponent.</li>
-                <li>Watch out for News Alerts!</li>
+                <li><strong>D</strong> means the fee/dividend (example: <strong>D250</strong>).</li>
+                <li>Buy shares to earn dividends and outlast your opponents.</li>
             </ul>
         </div>
     );

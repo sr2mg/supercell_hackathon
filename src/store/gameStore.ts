@@ -162,7 +162,6 @@ export const useGameStore = create<GameState>((set, get) => ({
 
     nextTurn: () => {
         const { activePlayerIndex, players, turnCount, triggerNews } = get();
-        triggerNews();
 
         get().checkGameEnd();
         if (get().winner) return;
@@ -181,6 +180,11 @@ export const useGameStore = create<GameState>((set, get) => ({
             turnCount: nextTurnCount,
             hasRolled: false
         });
+
+        // Trigger news once per full round (when it returns to first player)
+        if (nextIndex === 0) {
+            triggerNews();
+        }
 
         if (players[nextIndex].isComputer) {
             // Wait for news overlay to finish (3s) before rolling

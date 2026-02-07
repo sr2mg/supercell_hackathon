@@ -72,7 +72,7 @@ export function NewsBlock({
                 </div>
             </div>
 
-            {/* Breaking/Noise label on red bar */}
+            {/* Breaking label on red bar */}
             <div className="absolute left-[3%] top-[18%]">
                 <span
                     className="text-white uppercase"
@@ -85,7 +85,7 @@ export function NewsBlock({
                         letterSpacing: '0%',
                     }}
                 >
-                    {tagLabel === 'NOISE' ? 'NOISE' : 'BREAKING NEWS'}
+                    BREAKING NEWS
                 </span>
             </div>
         </div>
