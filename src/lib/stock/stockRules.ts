@@ -6,13 +6,13 @@ export function canBuyAsset(asset: Asset | undefined, player: Player): boolean {
     if (!asset) return false;
     if (asset.isPayday) return false;
     if (asset.isBankrupt) return false;
-    return asset.sharesRemaining > 0 && player.money >= SHARE_PRICE;
+    return asset.sharesRemaining > 0 && player.money >= asset.price;
 }
 
 export function getPlayerAssets(player: Player, board: Asset[]): number {
     const shareValue = board.reduce((acc, asset) => {
         const ownedShares = asset.shareholders.find(h => h.playerId === player.id)?.shares || 0;
-        return acc + (ownedShares * SHARE_VALUE);
+        return acc + (ownedShares * asset.price);
     }, 0);
     return player.money + shareValue;
 }
@@ -53,9 +53,14 @@ export function sellSharesForCash(player: Player, board: Asset[], amountNeeded: 
     let updatedBoard = [...board];
     for (const { asset, owned } of prioritized) {
         if (cash >= amountNeeded) break;
-        const sharesToSell = Math.min(owned, Math.ceil((amountNeeded - cash) / SHARE_VALUE));
+
+        const price = asset.price;
+        if (price <= 0) continue; // Cannot sell worthless stock
+
+        const sharesToSell = Math.min(owned, Math.ceil((amountNeeded - cash) / price));
         if (sharesToSell <= 0) continue;
-        cash += sharesToSell * SHARE_VALUE;
+
+        cash += sharesToSell * price;
         updatedBoard = updatedBoard.map(t => {
             if (t.id !== asset.id) return t;
             const newShareholders = t.shareholders

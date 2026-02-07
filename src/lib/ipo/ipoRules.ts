@@ -22,6 +22,8 @@ export function applyBankruptcyAndIpo(board: Asset[], ipoIndex: number) {
             name: ipo.name,
             tag: ipo.tag,
             dividend: 200,
+            price: 500,
+            previousPrice: 500,
             sharesRemaining: asset.sharesTotal,
             shareholders: [],
             isBankrupt: false,

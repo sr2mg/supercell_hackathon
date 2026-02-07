@@ -3,7 +3,7 @@ import { INITIAL_BOARD, Asset, Tag } from '../data/boardData';
 import type { Player } from '@/types/game';
 import { NewsCard } from '@/lib/types';
 import { applyBankruptcyAndIpo } from '@/lib/ipo/ipoRules';
-import { SHARE_PRICE } from '@/lib/stock/stockConstants';
+import { SHARE_PRICE, SHARE_VALUE } from '@/lib/stock/stockConstants';
 import {
     canBuyAsset,
     getPlayerAssets,
@@ -39,6 +39,7 @@ interface GameState {
     triggerNews: () => void;
     fetchNews: () => Promise<void>;
     buyShare: (assetId: number) => void;
+    sellShare: (assetId: number) => void;
     resolveTileEffect: (tile: Asset, player: Player) => void;
 }
 
@@ -227,15 +228,37 @@ export const useGameStore = create<GameState>((set, get) => ({
                 if (asset.tag === effectTag && !asset.isBankrupt && !asset.isPayday) {
                     const change = isUp ? noiseAmount : -noiseAmount;
                     const newDividend = Math.max(0, asset.dividend + change);
-                    // 変動前のdividendをpreviousDividendに保存
-                    return { ...asset, previousDividend: asset.dividend, dividend: newDividend };
+
+                    // Stock Price Logic: Change is 2x Dividend Change
+                    // If Dividend becomes 0 (Bankrupt), Price becomes 0
+                    let newPrice = 0;
+                    if (newDividend > 0) {
+                        const priceChange = change * 2;
+                        newPrice = Math.max(0, asset.price + priceChange);
+                    }
+
+                    return {
+                        ...asset,
+                        previousDividend: asset.dividend,
+                        dividend: newDividend,
+                        previousPrice: asset.price,
+                        price: newPrice
+                    };
                 }
-                // effectTagに関係ないアセットもpreviousDividendをリセット（変動なし）
-                return { ...asset, previousDividend: asset.dividend };
+                // effectTagに関係ないアセットもpreviousリセット
+                return {
+                    ...asset,
+                    previousDividend: asset.dividend,
+                    previousPrice: asset.price
+                };
             });
         } else {
-            // 効果なしの場合もpreviousDividendをリセット
-            newBoard = newBoard.map(asset => ({ ...asset, previousDividend: asset.dividend }));
+            // 効果なしの場合もpreviousリセット
+            newBoard = newBoard.map(asset => ({
+                ...asset,
+                previousDividend: asset.dividend,
+                previousPrice: asset.price
+            }));
         }
 
         // Apply Bankruptcy & IPO Rules
@@ -282,8 +305,12 @@ export const useGameStore = create<GameState>((set, get) => ({
         if (!asset) return;
         if (!canBuyAsset(asset, player)) return;
 
+        // Buy at current Market Price, not fixed share price
+        // Check if player has enough money for current price
+        if (player.money < asset.price) return;
+
         const updatedPlayers = [...players];
-        updatedPlayers[activePlayerIndex] = { ...player, money: player.money - SHARE_PRICE };
+        updatedPlayers[activePlayerIndex] = { ...player, money: player.money - asset.price };
 
         const updatedBoard = board.map(t => {
             if (t.id !== assetId) return t;
@@ -302,6 +329,40 @@ export const useGameStore = create<GameState>((set, get) => ({
             return {
                 ...t,
                 sharesRemaining: Math.max(0, t.sharesRemaining - 1),
+                shareholders: newShareholders
+            };
+        });
+
+        set({ players: updatedPlayers, board: updatedBoard });
+    },
+
+    sellShare: (assetId) => {
+        const { players, activePlayerIndex, board, hasRolled } = get();
+
+        // Only allow selling before rolling dice
+        if (hasRolled) return;
+
+        const player = players[activePlayerIndex];
+        const asset = board.find(t => t.id === assetId);
+
+        if (!asset) return;
+
+        // Check if player owns at least 1 share
+        const holding = asset.shareholders.find(h => h.playerId === player.id);
+        if (!holding || holding.shares <= 0) return;
+
+        // Sell at current Market Price
+        const updatedPlayers = [...players];
+        updatedPlayers[activePlayerIndex] = { ...player, money: player.money + asset.price };
+
+        const updatedBoard = board.map(t => {
+            if (t.id !== assetId) return t;
+            const newShareholders = t.shareholders
+                .map(h => h.playerId === player.id ? { ...h, shares: h.shares - 1 } : h)
+                .filter(h => h.shares > 0);
+            return {
+                ...t,
+                sharesRemaining: Math.min(t.sharesTotal, t.sharesRemaining + 1),
                 shareholders: newShareholders
             };
         });

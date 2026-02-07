@@ -3,7 +3,6 @@ import { useGameStore, canBuyAsset } from '@/store/gameStore';
 import { useShallow } from 'zustand/react/shallow';
 import { Dice1, Dice2, Dice3, Dice4, Dice5, Dice6, SkipForward, DollarSign } from 'lucide-react';
 import clsx from 'clsx';
-import { SHARE_VALUE } from '@/lib/stock/stockConstants';
 import type { Asset } from '@/data/boardData';
 
 const DiceIcons = [Dice1, Dice1, Dice2, Dice3, Dice4, Dice5, Dice6];
@@ -18,9 +17,10 @@ export function ControlPanel() {
         hasRolled,
         turnCount,
         nextTurn,
-        currentNews, // kept for future use context
+        currentNews,
         board,
-        buyShare
+        buyShare,
+        sellShare
     } = useGameStore(useShallow(state => ({
         players: state.players,
         activePlayerIndex: state.activePlayerIndex,
@@ -32,7 +32,8 @@ export function ControlPanel() {
         nextTurn: state.nextTurn,
         currentNews: state.currentNews,
         board: state.board,
-        buyShare: state.buyShare
+        buyShare: state.buyShare,
+        sellShare: state.sellShare
     })));
 
     const activePlayer = players[activePlayerIndex];
@@ -40,7 +41,7 @@ export function ControlPanel() {
 
     const canBuy = canBuyAsset(currentTile, activePlayer);
     const holdings = getHoldings(board, activePlayer.id);
-    const stockValue = holdings.reduce((acc, h) => acc + (h.shares * SHARE_VALUE), 0);
+    const stockValue = holdings.reduce((acc, h) => acc + (h.shares * h.price), 0);
     const netWorth = activePlayer.money + stockValue;
 
     return (
@@ -78,7 +79,7 @@ export function ControlPanel() {
                         onClick={() => buyShare(currentTile.id)}
                         className="col-span-2 bg-green-600 text-white py-3 rounded-lg font-bold hover:bg-green-700 transition-all flex items-center justify-center gap-2 animate-bounce-short shadow-md"
                     >
-                        <DollarSign size={18} /> Buy 1 share ({currentTile.name}) ($500)
+                        <DollarSign size={18} /> Buy 1 share ({currentTile.name}) (${currentTile.price})
                     </button>
                 )}
 
@@ -116,15 +117,24 @@ export function ControlPanel() {
                         <div className="mt-2 space-y-1">
                             {holdings.map(h => {
                                 const pnl = h.dividend - h.purchaseDividend;
+                                const canSell = !hasRolled && !activePlayer.isComputer;
                                 return (
                                     <div key={h.id} className="flex items-center justify-between text-[11px] text-slate-700">
-                                        <div className="truncate max-w-[150px]">{h.name}</div>
+                                        <div className="truncate max-w-[120px]">{h.name}</div>
                                         <div className="font-mono flex items-center gap-1">
                                             <span>D${h.dividend}</span>
                                             <span className={pnl >= 0 ? 'text-green-600' : 'text-red-600'}>
                                                 ({pnl >= 0 ? '+' : ''}{pnl})
                                             </span>
-                                            <span>· {h.shares}sh · ${h.shares * SHARE_VALUE}</span>
+                                            <span>· {h.shares}sh</span>
+                                            {canSell && (
+                                                <button
+                                                    onClick={() => sellShare(h.id)}
+                                                    className="ml-1 px-1.5 py-0.5 bg-red-100 text-red-600 rounded text-[10px] font-medium hover:bg-red-200 transition-colors"
+                                                >
+                                                    売却 (${h.price})
+                                                </button>
+                                            )}
                                         </div>
                                     </div>
                                 );
@@ -138,7 +148,7 @@ export function ControlPanel() {
             <div className="mt-4 space-y-2">
                 {players.map(p => {
                     const playerHoldings = getHoldings(board, p.id);
-                    const playerStockValue = playerHoldings.reduce((acc, h) => acc + (h.shares * SHARE_VALUE), 0);
+                    const playerStockValue = playerHoldings.reduce((acc, h) => acc + (h.shares * h.price), 0);
                     const playerNetWorth = p.money + playerStockValue;
                     return (
                         <div key={p.id} className={clsx(
@@ -174,7 +184,7 @@ export function ControlPanel() {
                                                             <span className={pnl >= 0 ? 'text-green-400' : 'text-red-400'}>
                                                                 ({pnl >= 0 ? '+' : ''}{pnl})
                                                             </span>
-                                                            {' '}· ${h.shares * SHARE_VALUE}
+                                                            {' '}· ${h.shares * h.price}
                                                         </span>
                                                     </div>
                                                 );
@@ -210,6 +220,7 @@ function getHoldings(board: Asset[], playerId: number) {
                 name: asset.name,
                 shares: holder.shares,
                 dividend: asset.dividend,
+                price: asset.price,
                 purchaseDividend: holder.purchaseDividend
             };
         })
