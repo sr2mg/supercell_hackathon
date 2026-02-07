@@ -260,17 +260,33 @@ export function ControlPanel() {
                                     const playerHoldings = getHoldings(board, p.id);
                                     const playerStockValue = playerHoldings.reduce((acc, h) => acc + (h.shares * h.price), 0);
                                     const playerNetWorth = p.money + playerStockValue;
+                                    const isActive = p.id === activePlayer.id;
+                                    const isUser = !p.isComputer;
 
                                     return (
-                                        <div key={p.id} className="group relative flex items-center gap-3 py-2">
+                                        <div
+                                            key={p.id}
+                                            className={clsx(
+                                                "group relative flex items-center gap-3 py-2 pl-2 pr-4 rounded-xl transition-all",
+                                                isActive && "border-[3px] border-black bg-black/5"
+                                            )}
+                                        >
                                             {/* Player Token */}
                                             <div className="relative shrink-0">
-                                                {!p.isComputer && (
+                                                {isUser && (
                                                     <div
                                                         className="absolute -top-4 left-1/2 -translate-x-1/2 text-xs text-black tracking-widest"
                                                         style={{ fontFamily: 'var(--font-lilita-one)' }}
                                                     >
                                                         YOU
+                                                    </div>
+                                                )}
+                                                {isActive && isUser && (
+                                                    <div
+                                                        className="absolute -bottom-5 left-1/2 -translate-x-1/2 text-[10px] text-white bg-black px-2 py-0.5 rounded-full tracking-widest animate-pulse"
+                                                        style={{ fontFamily: 'var(--font-lilita-one)' }}
+                                                    >
+                                                        YOUR TURN
                                                     </div>
                                                 )}
                                                 <div
