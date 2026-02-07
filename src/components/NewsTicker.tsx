@@ -66,7 +66,7 @@ export function NewsTicker() {
 
                     <div className="flex flex-col flex-1">
                         <h2 className="text-lg md:text-2xl font-black tracking-tighter flex items-center gap-3">
-                            {activeNews.titleJa}
+                            {activeNews.titleEn}
                             {isMarket && isUp && <TrendingUp className="text-green-400 w-6 h-6" />}
                             {isMarket && isDown && <TrendingDown className="text-red-400 w-6 h-6" />}
                             {!isMarket && <Radio className="text-slate-400 w-5 h-5" />}
@@ -78,7 +78,7 @@ export function NewsTicker() {
                                 </span>
                             )}
                             <p className="text-slate-300 text-xs md:text-sm font-medium">
-                                {activeNews.reasonJa}
+                                {activeNews.reasonEn}
                             </p>
                         </div>
                     </div>
@@ -102,7 +102,7 @@ export function NewsTicker() {
                             )}>
                                 [{news.tag || 'GENERAL'}]
                             </span>
-                            <strong className="text-slate-200">{news.titleJa}</strong>
+                            <strong className="text-slate-200">{news.titleEn}</strong>
                             {news.direction === 'UP' && <span className="text-green-500 font-bold">▲UP</span>}
                             {news.direction === 'DOWN' && <span className="text-red-500 font-bold">▼DOWN</span>}
                         </span>
