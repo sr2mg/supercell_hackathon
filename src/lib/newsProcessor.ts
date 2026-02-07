@@ -17,6 +17,7 @@ Task:
 3. If MARKET, assign ONE most relevant Tag from the 6 above.
 4. If NOISE, Tag is null.
 5. Generate a satirical/short reason (max 1 sentence) for the effect.
+6. Generate a short, funny reaction line (max 1 sentence) that feels like a tabloid quip.
 6. Determine sentiment direction (UP for positive news, DOWN for negative).
 7. Return a JSON array of objects.
 
@@ -28,6 +29,7 @@ Output JSON Structure:
     "tag": "AI" | "CHIPS" | "ENERGY" | "GOV" | "CRYPTO" | "MEDIA" | null,
     "title": "Short, Punchy Title",
     "reason": "Why it affects the market (1 sentence)",
+    "reaction": "Funny reaction line (1 sentence)",
     "direction": "UP" | "DOWN"
   }
 ]
@@ -105,6 +107,7 @@ async function processBatch(batchNews: any[], startIndex: number): Promise<NewsC
             tag: asTag(item.tag),
             title: item.title,
             reason: item.reason,
+            reactionText: item.reaction,
             description: batchNews[index]?.description || undefined,
             direction: asDirection(item.direction),
             url: batchNews[index]?.link || undefined

@@ -302,8 +302,11 @@ export const useGameStore = create<GameState>((set, get) => ({
         // Apply Bankruptcy & IPO Rules
         const applied = applyBankruptcyAndIpo(newBoard, get().ipoIndex);
 
+        const reactionText = nextNews.reactionText
+            || (effectTag ? 'Traders are yelling into the void.' : 'Nothingburger, but make it loud.');
+
         set(state => ({
-            currentNews: { ...nextNews, impactText },
+            currentNews: { ...nextNews, impactText, reactionText },
             newsQueue: remainingQueue,
             newsLog: [nextNews, ...state.newsLog],
             board: applied.board,

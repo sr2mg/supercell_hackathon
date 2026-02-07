@@ -15,4 +15,5 @@ export interface NewsCard {
     direction: NewsDirection | null;
     url?: string; // BBC article URL
     impactText?: string; // English impact sentence shown in UI
+    reactionText?: string; // Short funny reaction line shown under impact
 }

@@ -5,6 +5,7 @@ interface NewsBlockProps {
     subtitle?: string | null;
     reason?: string | null;
     impact?: string | null;
+    reaction?: string | null;
     tagLabel?: string | null;
     direction?: 'UP' | 'DOWN' | null;
     size?: 'md' | 'lg';
@@ -15,6 +16,7 @@ export function NewsBlock({
     subtitle,
     reason,
     impact,
+    reaction,
     tagLabel,
     direction,
     size = 'lg',
@@ -66,6 +68,14 @@ export function NewsBlock({
                                 size === 'lg' ? "text-base md:text-2xl" : "text-sm md:text-lg"
                             )}>
                                 {impact}
+                            </div>
+                        )}
+                        {reaction && (
+                            <div className={clsx(
+                                "text-slate-700 mt-1 italic",
+                                size === 'lg' ? "text-xs md:text-sm" : "text-[10px] md:text-xs"
+                            )}>
+                                {reaction}
                             </div>
                         )}
                     </div>
