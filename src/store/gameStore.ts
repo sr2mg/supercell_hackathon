@@ -160,7 +160,7 @@ export const useGameStore = create<GameState>((set, get) => ({
     },
 
     triggerNews: () => {
-        let { newsQueue } = get();
+        let { newsQueue, turnCount } = get();
 
         // Refill if getting low (background fetch)
         if (newsQueue.length < 5) {
@@ -168,29 +168,47 @@ export const useGameStore = create<GameState>((set, get) => ({
         }
 
         const fallbackNews = newsQueue.length > 0 ? newsQueue[0] : MOCK_NEWS[0];
-        // If queue is empty (fetch failed?), recycle mock or just use what we have
-        // Ideally we should always have news.
-
         const nextNews = newsQueue.length > 0 ? newsQueue[0] : fallbackNews;
         const remainingQueue = newsQueue.length > 0 ? newsQueue.slice(1) : [];
+
+        // Determine Major/Minor: Major every 3rd turn (±200), Minor otherwise (±100)
+        const isMajor = turnCount % 3 === 0;
+        const amount = isMajor ? 200 : 100;
 
         // Apply News Effect to Board
         let newBoard = [...get().board];
         let lastDownTag: Tag | null = null;
+        let effectTag: Tag | null = null;
 
         if (nextNews.type === 'MARKET' && nextNews.tag) {
-            const amount = 100; // Fixed amount for now
-            const isUp = nextNews.direction === 'UP';
+            // MARKET news: use the LLM-assigned tag
+            effectTag = nextNews.tag;
+        } else if (nextNews.type === 'NOISE') {
+            // NOISE news: random tag with weighted probabilities
+            // CRYPTO: 40%, MEDIA: 30%, AI: 10%, CHIPS: 10%, ENERGY: 5%, GOV: 5%
+            const rand = Math.random();
+            if (rand < 0.40) effectTag = 'CRYPTO';
+            else if (rand < 0.70) effectTag = 'MEDIA';
+            else if (rand < 0.80) effectTag = 'AI';
+            else if (rand < 0.90) effectTag = 'CHIPS';
+            else if (rand < 0.95) effectTag = 'ENERGY';
+            else effectTag = 'GOV';
+        }
+
+        if (effectTag) {
+            // Determine direction: use LLM direction if available, else 50/50
+            const isUp = nextNews.direction === 'UP' ? true :
+                nextNews.direction === 'DOWN' ? false :
+                    Math.random() < 0.5;
 
             if (!isUp) {
-                lastDownTag = nextNews.tag;
+                lastDownTag = effectTag;
             }
 
             newBoard = newBoard.map(asset => {
-                if (asset.tag === nextNews.tag && !asset.isBankrupt && !asset.isPayday) {
+                if (asset.tag === effectTag && !asset.isBankrupt && !asset.isPayday) {
                     const change = isUp ? amount : -amount;
                     const newDividend = Math.max(0, asset.dividend + change);
-                    // 0 means bankrupt effectively, but we handle explicit bankruptcy next
                     return { ...asset, dividend: newDividend };
                 }
                 return asset;
@@ -206,7 +224,7 @@ export const useGameStore = create<GameState>((set, get) => ({
             newsLog: [nextNews, ...state.newsLog],
             board: applied.board,
             ipoIndex: applied.ipoIndex,
-            lastDownTag: lastDownTag || state.lastDownTag // Update only if meaningful? Or just track latest crash
+            lastDownTag: lastDownTag || state.lastDownTag
         }));
     },
 
