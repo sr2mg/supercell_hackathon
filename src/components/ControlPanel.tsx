@@ -68,9 +68,10 @@ export function ControlPanel() {
                 <button
                     onClick={rollDice}
                     disabled={isRolling || hasRolled || activePlayer.isComputer}
-                    className="col-span-2 bg-slate-900 text-white py-3 rounded-lg font-bold hover:bg-slate-800 disabled:opacity-50 transition-all flex items-center justify-center gap-2 shadow-sm"
+                    className="col-span-2 text-black text-4xl tracking-widest leading-none py-2 border-4 border-black rounded-full disabled:opacity-30 transition-all flex items-center justify-center hover:scale-105 active:scale-95"
+                    style={{ fontFamily: 'var(--font-lilita-one)' }}
                 >
-                    {isRolling ? 'Rolling...' : 'ROLL DICE'}
+                    {isRolling ? 'ROLLING...' : 'ROLL'}
                 </button>
 
                 {canBuy && !activePlayer.isComputer && (
