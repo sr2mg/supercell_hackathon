@@ -10,12 +10,12 @@ interface TileProps {
 
 export function Tile({ tile, playersOnTile, orientation = 'bottom' }: TileProps) {
     const colorMap: Record<Tag, string> = {
-        AI: '#19C7D8',
-        CHIPS: '#F2C94C',
-        ENERGY: '#F2994A',
-        GOV: '#9B51E0',
-        CRYPTO: '#27AE60',
-        MEDIA: '#EB4CB7',
+        AI: '#07A5E2',
+        CHIPS: '#F5D304',
+        ENERGY: '#F99408',
+        GOV: '#B586DF',
+        CRYPTO: '#00E16D',
+        MEDIA: '#FDA3F5',
     };
 
     const playerColors: Record<number, string> = {
