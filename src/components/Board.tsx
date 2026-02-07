@@ -38,8 +38,11 @@ export function Board() {
                         gridRowEnd: sideLength
                     }}
                 >
-                    <h1 className="text-4xl sm:text-6xl md:text-8xl font-bebas font-black text-slate-800 tracking-tighter mb-2 md:mb-4">NEWSOPOLY</h1>
-                    <div className="text-[10px] sm:text-sm text-slate-500 font-medium uppercase tracking-widest">Global Edition</div>
+                    <img
+                        src="/logo-s.png"
+                        alt="Newsopoly"
+                        className="w-2/3 max-w-[520px] h-auto"
+                    />
                 </div>
 
                 {board.map((tile, index) => {
