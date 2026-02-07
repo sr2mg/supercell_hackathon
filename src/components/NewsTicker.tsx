@@ -6,12 +6,21 @@ import { clsx } from 'clsx';
 import { useEffect, useState } from 'react';
 
 export function NewsTicker() {
-    const { currentNews, newsLog } = useGameStore(useShallow(state => ({
+    const { currentNews, newsLog, fetchNews, newsQueue } = useGameStore(useShallow(state => ({
         currentNews: state.currentNews,
-        newsLog: state.newsLog
+        newsLog: state.newsLog,
+        fetchNews: state.fetchNews,
+        newsQueue: state.newsQueue
     })));
 
     const [visible, setVisible] = useState(false);
+
+    useEffect(() => {
+        // Initial fetch if queue is empty
+        if (newsQueue.length === 0) {
+            fetchNews();
+        }
+    }, [fetchNews, newsQueue.length]);
 
     useEffect(() => {
         if (currentNews) {

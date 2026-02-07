@@ -27,6 +27,7 @@ interface GameState {
     dice: [number, number];
     isRolling: boolean;
     currentNews: NewsEffect | null;
+    newsQueue: NewsEffect[];
     newsLog: NewsEffect[];
     hasRolled: boolean;
     winner: Player | null;
@@ -38,6 +39,7 @@ interface GameState {
     nextTurn: () => void;
     checkGameEnd: () => void;
     triggerNews: () => void;
+    fetchNews: () => Promise<void>;
     buyProperty: (tileId: number) => void;
     resolveTileEffect: (tile: Tile, player: Player) => void;
 }
@@ -129,6 +131,7 @@ export const useGameStore = create<GameState>((set, get) => ({
     isRolling: false,
     hasRolled: false,
     currentNews: null,
+    newsQueue: [],
     newsLog: [],
     winner: null,
     winningReason: null,
@@ -195,28 +198,49 @@ export const useGameStore = create<GameState>((set, get) => ({
         }
     },
 
-    triggerNews: async () => {
+    triggerNews: () => {
+        let { newsQueue } = get();
+
+        // Refill if getting low (background fetch)
+        if (newsQueue.length < 5) {
+            get().fetchNews();
+        }
+
+        // If completely empty, try to fetch/wait? 
+        // For simplicity, if empty, we might skip update or use fallback immediately if fetch feels too slow.
+        // But since we trigger fetch on init, it should be fine.
+
+        if (newsQueue.length > 0) {
+            const [nextNews, ...remainingQueue] = newsQueue;
+            set(state => ({
+                currentNews: nextNews,
+                newsQueue: remainingQueue,
+                newsLog: [nextNews, ...state.newsLog]
+            }));
+        } else {
+            // If truly empty, maybe fetch synchronously-ish or await?
+            // But valid flow is: background fetch should have caught up.
+            // If not, we just don't update news this micro-turn.
+            get().fetchNews();
+        }
+    },
+
+    fetchNews: async () => {
         try {
             const res = await fetch('/api/news');
-            const news = await res.json();
+            const data = await res.json();
 
-            const newEffect: NewsEffect = {
-                title: news.title,
-                description: news.description,
-                type: news.type as NewsEffect['type'],
-                multiplier: news.multiplier
-            };
+            // Validate it's an array
+            const newItems = Array.isArray(data) ? data : [];
 
             set(state => ({
-                currentNews: newEffect,
-                newsLog: [newEffect, ...state.newsLog]
+                newsQueue: [...state.newsQueue, ...newItems]
             }));
         } catch (err) {
             console.error("Failed to fetch news", err);
-            const randomNews = MOCK_NEWS[Math.floor(Math.random() * MOCK_NEWS.length)];
+            // Fallback
             set(state => ({
-                currentNews: randomNews,
-                newsLog: [randomNews, ...state.newsLog]
+                newsQueue: [...state.newsQueue, ...MOCK_NEWS]
             }));
         }
     },
