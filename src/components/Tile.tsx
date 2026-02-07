@@ -28,15 +28,14 @@ export function Tile({ tile, playersOnTile, orientation = 'bottom' }: TileProps)
     if (tile.isPayday) {
         return (
             <div className={twMerge(
-                "relative border-4 border-black flex flex-col items-center justify-between select-none bg-white",
+                "relative flex flex-col items-center justify-between select-none bg-white",
                 "aspect-square w-full h-full"
             )}>
-                <div className="flex-1 w-full flex items-center justify-center">
-                    <div className="text-center">
-                        <div className="text-3xl font-black tracking-tight">PAY DAY</div>
-                        <div className="text-xs text-slate-600 mt-1">+200</div>
-                    </div>
-                </div>
+                <img
+                    src="/payday.svg"
+                    alt="Payday"
+                    className="w-full h-full object-cover"
+                />
             </div>
         );
     }
