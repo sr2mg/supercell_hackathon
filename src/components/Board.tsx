@@ -1,6 +1,7 @@
 'use client';
 import { useGameStore } from '@/store/gameStore';
 import { Tile } from './Tile';
+import { DiceRollModal } from './DiceRollModal';
 import { useShallow } from 'zustand/react/shallow';
 import { getGridSize, getTileGridArea } from '@/lib/boardUtils';
 
@@ -44,6 +45,9 @@ export function Board() {
                         className="w-2/3 max-w-[520px] h-auto"
                     />
                 </div>
+
+                {/* Modal Overlay for Dice */}
+                <DiceRollModal />
 
                 {board.map((tile, index) => {
                     const coords = getTileGridArea(index, totalTiles);

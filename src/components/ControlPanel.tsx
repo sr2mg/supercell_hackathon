@@ -1,18 +1,15 @@
 'use client';
 import { useGameStore, canBuyAsset } from '@/store/gameStore';
 import { useShallow } from 'zustand/react/shallow';
-import { Dice1, Dice2, Dice3, Dice4, Dice5, Dice6, SkipForward, DollarSign } from 'lucide-react';
+import { SkipForward, DollarSign } from 'lucide-react';
 import clsx from 'clsx';
 import type { Asset } from '@/data/boardData';
 import { useState } from 'react';
-
-const DiceIcons = [Dice1, Dice1, Dice2, Dice3, Dice4, Dice5, Dice6];
 
 export function ControlPanel() {
     const {
         players,
         activePlayerIndex,
-        dice,
         rollDice,
         isRolling,
         hasRolled,
@@ -25,7 +22,6 @@ export function ControlPanel() {
     } = useGameStore(useShallow(state => ({
         players: state.players,
         activePlayerIndex: state.activePlayerIndex,
-        dice: state.dice,
         rollDice: state.rollDice,
         isRolling: state.isRolling,
         hasRolled: state.hasRolled,
@@ -65,12 +61,6 @@ export function ControlPanel() {
                         TURN {turnCount}
                     </h3>
                 </div>
-            </div>
-
-            {/* Dice Section */}
-            <div className="flex justify-center gap-4 py-4 bg-slate-50 rounded-lg">
-                <DiceIcon value={dice[0]} isRolling={isRolling} />
-                <DiceIcon value={dice[1]} isRolling={isRolling} />
             </div>
 
             {/* Actions */}
@@ -251,10 +241,7 @@ export function ControlPanel() {
     );
 }
 
-function DiceIcon({ value, isRolling }: { value: number, isRolling: boolean }) {
-    const Icon = DiceIcons[value] || Dice1;
-    return <Icon className={`w-12 h-12 text-slate-800 ${isRolling ? 'animate-spin' : ''}`} />;
-}
+
 
 function getHoldings(board: Asset[], playerId: number) {
     return board

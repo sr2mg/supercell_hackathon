@@ -107,17 +107,19 @@ export const useGameStore = create<GameState>((set, get) => ({
             triggerNews();
         }
 
-        set({ isRolling: true });
+        const d1 = Math.floor(Math.random() * 6) + 1;
+        // Set target dice immediately so UI can animate towards it
+        set({ isRolling: true, dice: [d1, 1] });
+
         setTimeout(() => {
-            const d1 = Math.floor(Math.random() * 6) + 1;
-            set({ dice: [d1, 1], isRolling: false, hasRolled: true });
+            set({ isRolling: false, hasRolled: true });
             get().movePlayer(d1);
 
             const { activePlayerIndex, players } = get();
             if (players[activePlayerIndex].isComputer) {
                 setTimeout(() => runComputerTurn(get, activePlayerIndex), 1000);
             }
-        }, 600);
+        }, 2500);
     },
 
     movePlayer: (steps) => {
