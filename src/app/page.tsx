@@ -16,6 +16,7 @@ export default function Home() {
   const winningReason = useGameStore(state => state.winningReason);
   const players = useGameStore(state => state.players);
   const board = useGameStore(state => state.board);
+  const currentNews = useGameStore(state => state.currentNews);
   const [hasStarted, setHasStarted] = useState(false);
   const [showIntro, setShowIntro] = useState(false);
 
@@ -104,7 +105,7 @@ export default function Home() {
       <NewsTicker />
 
       {/* Main Content */}
-      <div className="flex-1 w-full max-w-7xl mx-auto flex flex-col lg:flex-row items-start justify-center gap-6 p-2 md:p-8">
+        <div className="flex-1 w-full max-w-7xl mx-auto flex flex-col lg:flex-row items-start justify-center gap-6 p-2 md:p-8">
 
         {/* Left: How to Play (Desktop) */}
         <div className="hidden lg:block w-64 lg:sticky lg:top-8 shrink-0">
@@ -113,7 +114,21 @@ export default function Home() {
 
         {/* Center: Board Container - Needs to preserve aspect ratio and fit screen */}
         <div className="flex-1 w-full flex justify-center items-start lg:sticky lg:top-8">
-          <Board />
+          <div className="flex flex-col items-center gap-2">
+            <Board />
+            {currentNews?.impactText && (
+              <div className="bg-white/95 border-[3px] border-black rounded-2xl px-6 py-3 shadow-lg w-[500px] max-w-[92vw]">
+                <div className="text-black font-black uppercase tracking-widest text-sm md:text-xl">
+                  {currentNews.impactText}
+                </div>
+                {currentNews.reactionText && (
+                  <div className="text-slate-700 italic text-xs md:text-sm mt-1">
+                    {currentNews.reactionText}
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
         </div>
 
         {/* Right: Controls - Stacks below on mobile */}

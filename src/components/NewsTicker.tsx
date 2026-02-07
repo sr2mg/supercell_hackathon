@@ -35,7 +35,9 @@ export function NewsTicker() {
             } else if (currentNews.direction === 'DOWN') {
                 playSound('negative', 0.5);
             }
-            const timer = setTimeout(() => setVisible(false), 3000);
+            const timer = setTimeout(() => {
+                setVisible(false);
+            }, 3000);
             return () => clearTimeout(timer);
         }
     }, [currentNews]);
