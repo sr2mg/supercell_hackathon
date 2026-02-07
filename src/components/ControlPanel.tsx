@@ -67,13 +67,13 @@ export function ControlPanel() {
             <div className="grid grid-cols-2 gap-2">
                 <button
                     onClick={rollDice}
-                    disabled={isRolling || hasRolled}
+                    disabled={isRolling || hasRolled || activePlayer.isComputer}
                     className="col-span-2 bg-slate-900 text-white py-3 rounded-lg font-bold hover:bg-slate-800 disabled:opacity-50 transition-all flex items-center justify-center gap-2 shadow-sm"
                 >
                     {isRolling ? 'Rolling...' : 'ROLL DICE'}
                 </button>
 
-                {canBuy && (
+                {canBuy && !activePlayer.isComputer && (
                     <button
                         onClick={() => buyShare(currentTile.id)}
                         className="col-span-2 bg-green-600 text-white py-3 rounded-lg font-bold hover:bg-green-700 transition-all flex items-center justify-center gap-2 animate-bounce-short shadow-md"
@@ -84,7 +84,8 @@ export function ControlPanel() {
 
                 <button
                     onClick={nextTurn}
-                    className="col-span-2 border border-slate-300 text-slate-600 py-2 rounded-lg font-medium hover:bg-slate-50 flex items-center justify-center gap-2"
+                    disabled={activePlayer.isComputer}
+                    className="col-span-2 border border-slate-300 text-slate-600 py-2 rounded-lg font-medium hover:bg-slate-50 disabled:opacity-50 flex items-center justify-center gap-2"
                 >
                     <SkipForward size={16} /> End Turn
                 </button>
