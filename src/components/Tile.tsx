@@ -1,5 +1,6 @@
 import { Asset as TileType, Tag } from '@/data/boardData';
 import { KomaTile } from './KomaTile';
+import { PlayerToken } from './PlayerToken';
 import { twMerge } from 'tailwind-merge';
 
 interface TileProps {
@@ -32,10 +33,26 @@ export function Tile({ tile, playersOnTile, orientation = 'bottom' }: TileProps)
                 "aspect-square w-full h-full"
             )}>
                 <img
-                    src="/payday.svg"
+                    src="/payday.svg" // Make sure this path is correct based on your project structure
                     alt="Payday"
                     className="w-full h-full object-cover"
                 />
+
+                {/* Players on Tile (similar to KomaTile) */}
+                <div className="absolute bottom-[5%] right-[5%] flex flex-col-reverse gap-1 items-end z-20">
+                    {playersOnTile.map(p => (
+                        <div
+                            key={p.id}
+                            className="relative z-20 transition-transform hover:scale-110"
+                            title={p.name}
+                        >
+                            <PlayerToken
+                                color={playerColors[p.id] || p.color}
+                                className="w-10 h-10 drop-shadow-md"
+                            />
+                        </div>
+                    ))}
+                </div>
             </div>
         );
     }
