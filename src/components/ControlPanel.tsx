@@ -128,18 +128,29 @@ export function ControlPanel() {
 
             {/* Player List */}
             <div className="mt-4 space-y-2">
-                {players.map(p => (
-                    <div key={p.id} className={clsx(
-                        "flex justify-between p-2 rounded transition-colors",
-                        p.id === activePlayer.id ? 'bg-slate-100 ring-1 ring-slate-300' : ''
-                    )}>
-                        <div className="flex items-center gap-2">
-                            <div className={`w-3 h-3 rounded-full ${p.color}`} />
-                            <span className="text-sm font-medium">{p.name}</span>
+                {players.map(p => {
+                    const playerHoldings = getHoldings(board, p.id);
+                    const playerStockValue = playerHoldings.reduce((acc, h) => acc + (h.shares * SHARE_VALUE), 0);
+                    const playerNetWorth = p.money + playerStockValue;
+                    return (
+                        <div key={p.id} className={clsx(
+                            "p-2 rounded transition-colors",
+                            p.id === activePlayer.id ? 'bg-slate-100 ring-1 ring-slate-300' : ''
+                        )}>
+                            <div className="flex justify-between items-center">
+                                <div className="flex items-center gap-2">
+                                    <div className={`w-3 h-3 rounded-full ${p.color}`} />
+                                    <span className="text-sm font-medium">{p.name}</span>
+                                </div>
+                                <div className="font-mono text-sm font-semibold">${playerNetWorth}</div>
+                            </div>
+                            <div className="flex justify-end gap-3 mt-1 text-[10px] text-slate-500">
+                                <span>Cash: ${p.money}</span>
+                                <span>Stock: ${playerStockValue}</span>
+                            </div>
                         </div>
-                        <div className="font-mono text-sm">${p.money}</div>
-                    </div>
-                ))}
+                    );
+                })}
             </div>
         </div>
     );
