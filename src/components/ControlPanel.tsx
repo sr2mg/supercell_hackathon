@@ -38,8 +38,7 @@ export function ControlPanel() {
 
     const canBuy = canBuyAsset(currentTile, activePlayer);
     const holdings = getHoldings(board, activePlayer.id);
-    const stockValue = holdings.reduce((acc, h) => acc + (h.shares * h.price), 0);
-    const netWorth = activePlayer.money + stockValue;
+
 
     const [sellAmounts, setSellAmounts] = useState<Record<number, number>>({});
 
@@ -94,71 +93,55 @@ export function ControlPanel() {
 
             {/* Active Player Summary */}
             <div className="rounded-lg border border-slate-200 bg-slate-50 p-3">
-                <div className="grid grid-cols-3 gap-2 text-center">
-                    <div>
-                        <div className="text-[10px] uppercase tracking-wide text-slate-500">Cash</div>
-                        <div className="font-mono font-semibold text-slate-800">${activePlayer.money}</div>
-                    </div>
-                    <div>
-                        <div className="text-[10px] uppercase tracking-wide text-slate-500">Stock</div>
-                        <div className="font-mono font-semibold text-slate-800">${stockValue}</div>
-                    </div>
-                    <div>
-                        <div className="text-[10px] uppercase tracking-wide text-slate-500">Net Worth</div>
-                        <div className="font-mono font-semibold text-slate-800">${netWorth}</div>
-                    </div>
-                </div>
-                <div className="mt-3">
-                    <div className="text-xs font-semibold text-slate-700">Holdings</div>
-                    {holdings.length === 0 && (
-                        <div className="text-[11px] text-slate-500 mt-1">No shares yet</div>
-                    )}
-                    {holdings.length > 0 && (
-                        <div className="mt-2 space-y-1">
-                            {holdings.map(h => {
-                                const pnl = h.dividend - h.purchaseDividend;
-                                const canSell = !hasRolled && !activePlayer.isComputer;
-                                const sellAmount = getSellAmount(h.id);
+                <div className="text-xs font-semibold text-slate-700">Holdings</div>
+                {holdings.length === 0 && (
+                    <div className="text-[11px] text-slate-500 mt-1">No shares yet</div>
+                )}
+                {holdings.length > 0 && (
+                    <div className="mt-2 space-y-1">
+                        {holdings.map(h => {
+                            const pnl = h.dividend - h.purchaseDividend;
+                            const canSell = !hasRolled && !activePlayer.isComputer;
+                            const sellAmount = getSellAmount(h.id);
 
-                                return (
-                                    <div key={h.id} className="flex items-center justify-between text-[11px] text-slate-700">
-                                        <div className="truncate max-w-[100px]">{h.name}</div>
-                                        <div className="font-mono flex items-center gap-2">
-                                            <span>D${h.dividend}</span>
-                                            <span className={pnl >= 0 ? 'text-green-600' : 'text-red-600'}>
-                                                ({pnl >= 0 ? '+' : ''}{pnl})
-                                            </span>
-                                            <span>· {h.shares}sh</span>
-                                            {canSell && (
-                                                <div className="flex items-center gap-1 bg-slate-100 rounded px-1">
-                                                    <button
-                                                        onClick={() => adjustSellAmount(h.id, -1, h.shares)}
-                                                        className="w-4 h-4 flex items-center justify-center text-slate-500 hover:text-slate-700 hover:bg-slate-200 rounded"
-                                                    >
-                                                        -
-                                                    </button>
-                                                    <span className="w-3 text-center font-bold">{sellAmount}</span>
-                                                    <button
-                                                        onClick={() => adjustSellAmount(h.id, 1, h.shares)}
-                                                        className="w-4 h-4 flex items-center justify-center text-slate-500 hover:text-slate-700 hover:bg-slate-200 rounded"
-                                                    >
-                                                        +
-                                                    </button>
-                                                    <button
-                                                        onClick={() => sellShare(h.id, sellAmount)}
-                                                        className="ml-1 px-1.5 py-0.5 bg-red-100 text-red-600 rounded text-[10px] font-medium hover:bg-red-200 transition-colors"
-                                                    >
-                                                        Sell (${h.price * sellAmount})
-                                                    </button>
-                                                </div>
-                                            )}
-                                        </div>
+                            return (
+                                <div key={h.id} className="flex items-center justify-between text-[11px] text-slate-700">
+                                    <div className="truncate max-w-[100px]">{h.name}</div>
+                                    <div className="font-mono flex items-center gap-2">
+                                        <span>D${h.dividend}</span>
+                                        <span className={pnl >= 0 ? 'text-green-600' : 'text-red-600'}>
+                                            ({pnl >= 0 ? '+' : ''}{pnl})
+                                        </span>
+                                        <span>· {h.shares}sh</span>
+                                        {canSell && (
+                                            <div className="flex items-center gap-1 bg-slate-100 rounded px-1">
+                                                <button
+                                                    onClick={() => adjustSellAmount(h.id, -1, h.shares)}
+                                                    className="w-4 h-4 flex items-center justify-center text-slate-500 hover:text-slate-700 hover:bg-slate-200 rounded"
+                                                >
+                                                    -
+                                                </button>
+                                                <span className="w-3 text-center font-bold">{sellAmount}</span>
+                                                <button
+                                                    onClick={() => adjustSellAmount(h.id, 1, h.shares)}
+                                                    className="w-4 h-4 flex items-center justify-center text-slate-500 hover:text-slate-700 hover:bg-slate-200 rounded"
+                                                >
+                                                    +
+                                                </button>
+                                                <button
+                                                    onClick={() => sellShare(h.id, sellAmount)}
+                                                    className="ml-1 px-1.5 py-0.5 bg-red-100 text-red-600 rounded text-[10px] font-medium hover:bg-red-200 transition-colors"
+                                                >
+                                                    Sell (${h.price * sellAmount})
+                                                </button>
+                                            </div>
+                                        )}
                                     </div>
-                                );
-                            })}
-                        </div>
-                    )}
-                </div>
+                                </div>
+                            );
+                        })}
+                    </div>
+                )}
             </div>
 
             {/* Player List */}
