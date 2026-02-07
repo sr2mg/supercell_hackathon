@@ -45,6 +45,7 @@ export function Tile({ tile, playersOnTile, orientation = 'bottom' }: TileProps)
             name={tile.name}
             tag={tile.tag}
             value={tile.dividend}
+            price={tile.price}
             colorHex={colorMap[tile.tag] || '#E5E7EB'}
             shareholders={tile.shareholders}
             playersOnTile={playersOnTile}
