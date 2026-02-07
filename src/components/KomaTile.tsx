@@ -45,21 +45,22 @@ export function KomaTile({
                 <image href="/koma.svg" x="0" y="0" width="300" height="300" />
 
                 {/* Title */}
-                <text x="22" y="110" fontFamily="Lilita One, sans-serif" fontSize="20" fill="black">
+                <text x="22" y="110" fontFamily="var(--font-lilita), sans-serif" fontWeight="400" fontSize="20" fill="black">
                     {name}
                 </text>
 
                 {/* Tag text (inside pill) */}
-                <text x="40" y="148" fontFamily="Lilita One, sans-serif" fontSize="12" fill="black">
+                <text x="40" y="148" fontFamily="var(--font-lilita), sans-serif" fontWeight="400" fontSize="12" fill="black">
                     {tag}
                 </text>
 
                 {/* Price */}
-                <text x="68" y="260" fontFamily="Lilita One, sans-serif" fontSize="32" fill="black">$</text>
+                <text x="68" y="260" fontFamily="var(--font-lilita), sans-serif" fontWeight="400" fontSize="32" fill="black">$</text>
                 <text
                     x="98"
                     y="265"
-                    fontFamily="Lilita One, sans-serif"
+                    fontFamily="var(--font-lilita), sans-serif"
+                    fontWeight="400"
                     fontSize="50"
                     fill="black"
                     letterSpacing="10%"

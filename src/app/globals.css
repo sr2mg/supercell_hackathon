@@ -13,6 +13,7 @@
   --font-display: var(--font-rammetto-one), ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
   --font-body: var(--font-inter), ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
   --font-bebas: var(--font-bebas-neue), ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+  --font-lilita: var(--font-lilita-one), ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
 }
 
 /*
@@ -37,6 +38,10 @@
 
 @utility font-bebas {
   font-family: var(--font-bebas);
+}
+
+@utility font-lilita {
+  font-family: var(--font-lilita);
 }
 
 :root {

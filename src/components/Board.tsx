@@ -25,7 +25,7 @@ export function Board() {
     return (
         <div className="w-full aspect-square bg-slate-200 p-1 md:p-2 rounded-xl shadow-2xl relative">
             <div
-                className="grid gap-0.5 md:gap-1 w-full h-full text-[10px] sm:text-xs"
+                className="grid gap-0 w-full h-full text-[10px] sm:text-xs"
                 style={containerStyle}
             >
                 {/* Center Logo / Play Area */}
