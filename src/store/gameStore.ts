@@ -144,9 +144,11 @@ export const useGameStore = create<GameState>((set, get) => ({
             safety += 1;
         }
 
+        const nextTurnCount = nextIndex === 0 ? turnCount + 1 : turnCount;
+
         set({
             activePlayerIndex: nextIndex,
-            turnCount: turnCount + 1,
+            turnCount: nextTurnCount,
             hasRolled: false
         });
 
