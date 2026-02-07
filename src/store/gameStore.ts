@@ -1,18 +1,17 @@
 import { create } from 'zustand';
 import { INITIAL_BOARD, Asset, Tag } from '../data/boardData';
+import type { Player } from '@/types/game';
+import { applyBankruptcyAndIpo } from '@/lib/ipo/ipoRules';
+import { SHARE_PRICE } from '@/lib/stock/stockConstants';
+import {
+    canBuyAsset,
+    getPlayerAssets,
+    removePlayerShares,
+    sellSharesForCash
+} from '@/lib/stock/stockRules';
+import { shouldComputerBuy } from '@/lib/players/playerRules';
 
-const SHARE_PRICE = 500;
-const SHARE_VALUE = 400;
-
-export interface Player {
-    id: number;
-    name: string;
-    money: number;
-    position: number;
-    color: string;
-    isComputer: boolean;
-    isAlive: boolean;
-}
+export { canBuyAsset } from '@/lib/stock/stockRules';
 
 export interface NewsEffect {
     title: string;
@@ -54,28 +53,6 @@ const MOCK_NEWS: NewsEffect[] = [
     { title: "Blackout!", description: "Utilities are offline. No rent for them.", type: 'UTILITY_FAIL', multiplier: 0 },
 ];
 
-const IPO_LIST: { name: string; tag: Tag; icon?: string }[] = [
-    { name: 'AI Safety Auditor', tag: 'AI' },
-    { name: 'Chip Packaging Plant', tag: 'CHIPS' },
-    { name: 'Battery & Storage', tag: 'ENERGY' },
-    { name: 'Stablecoin Bank', tag: 'CRYPTO', icon: 'Bitcoin' },
-    { name: 'Short Video Network', tag: 'MEDIA', icon: 'Film' },
-];
-
-function getPlayerAssets(player: Player, board: Asset[]): number {
-    const shareValue = board.reduce((acc, asset) => {
-        const ownedShares = asset.shareholders.find(h => h.playerId === player.id)?.shares || 0;
-        return acc + (ownedShares * SHARE_VALUE);
-    }, 0);
-    return player.money + shareValue;
-}
-
-export function canBuyAsset(asset: Asset | undefined, player: Player): boolean {
-    if (!asset) return false;
-    if (asset.isPayday) return false;
-    if (asset.isBankrupt) return false;
-    return asset.sharesRemaining > 0 && player.money >= SHARE_PRICE;
-}
 
 function runComputerTurn(get: () => GameState, activePlayerIndex: number) {
     const { board, buyShare, nextTurn, players } = get();
@@ -97,17 +74,6 @@ function runComputerTurn(get: () => GameState, activePlayerIndex: number) {
     setTimeout(() => nextTurn(), 1500);
 }
 
-function shouldComputerBuy(player: Player, asset: Asset): boolean {
-    if (asset.isPayday || asset.isBankrupt) return false;
-    if (asset.sharesRemaining <= 0) return false;
-    if (player.money < SHARE_PRICE) return false;
-    const reserve = 800;
-    if ((player.money - SHARE_PRICE) < reserve) return false;
-    if (asset.tag === 'CRYPTO' || asset.tag === 'MEDIA') {
-        return Math.random() < 0.7;
-    }
-    return Math.random() < 0.5;
-}
 
 export const useGameStore = create<GameState>((set, get) => ({
     players: [
@@ -332,81 +298,3 @@ export const useGameStore = create<GameState>((set, get) => ({
         set({ players: distributedPlayers, board: applied.board, ipoIndex: applied.ipoIndex });
     }
 }));
-function removePlayerShares(board: Asset[], playerId: number): Asset[] {
-    return board.map(asset => {
-        const owned = asset.shareholders.find(h => h.playerId === playerId)?.shares || 0;
-        if (owned === 0) return asset;
-        return {
-            ...asset,
-            sharesRemaining: Math.min(asset.sharesTotal, asset.sharesRemaining + owned),
-            shareholders: asset.shareholders.filter(h => h.playerId !== playerId)
-        };
-    });
-}
-
-function sellSharesForCash(player: Player, board: Asset[], amountNeeded: number, lastDownTag: Tag | null) {
-    let cash = player.money;
-    const ownedAssets = board
-        .map(asset => {
-            const owned = asset.shareholders.find(h => h.playerId === player.id)?.shares || 0;
-            return { asset, owned };
-        })
-        .filter(x => x.owned > 0);
-
-    if (ownedAssets.length === 0) {
-        return { ok: cash >= amountNeeded, cash, board };
-    }
-
-    const prioritized = ownedAssets.sort((a, b) => {
-        const aTag = a.asset.tag === lastDownTag ? -1 : 0;
-        const bTag = b.asset.tag === lastDownTag ? -1 : 0;
-        if (aTag !== bTag) return aTag - bTag;
-        if (a.asset.dividend !== b.asset.dividend) return a.asset.dividend - b.asset.dividend;
-        return Math.random() - 0.5;
-    });
-
-    let updatedBoard = [...board];
-    for (const { asset, owned } of prioritized) {
-        if (cash >= amountNeeded) break;
-        const sharesToSell = Math.min(owned, Math.ceil((amountNeeded - cash) / SHARE_VALUE));
-        if (sharesToSell <= 0) continue;
-        cash += sharesToSell * SHARE_VALUE;
-        updatedBoard = updatedBoard.map(t => {
-            if (t.id !== asset.id) return t;
-            const newShareholders = t.shareholders
-                .map(h => h.playerId === player.id ? { ...h, shares: h.shares - sharesToSell } : h)
-                .filter(h => h.shares > 0);
-            return {
-                ...t,
-                sharesRemaining: Math.min(t.sharesTotal, t.sharesRemaining + sharesToSell),
-                shareholders: newShareholders
-            };
-        });
-    }
-
-    return { ok: cash >= amountNeeded, cash, board: updatedBoard };
-}
-
-function applyBankruptcyAndIpo(board: Asset[], ipoIndex: number) {
-    let nextIndex = ipoIndex;
-    const updatedBoard = board.map(asset => {
-        if (asset.isPayday) return asset;
-        if (asset.dividend > 0) return asset;
-
-        const ipo = IPO_LIST[nextIndex % IPO_LIST.length];
-        nextIndex += 1;
-
-        return {
-            ...asset,
-            name: ipo.name,
-            tag: ipo.tag,
-            dividend: 200,
-            sharesRemaining: asset.sharesTotal,
-            shareholders: [],
-            isBankrupt: false,
-            icon: ipo.icon,
-        };
-    });
-
-    return { board: updatedBoard, ipoIndex: nextIndex };
-}

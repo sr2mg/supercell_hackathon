@@ -5,7 +5,7 @@ import { twMerge } from 'tailwind-merge';
 
 interface TileProps {
     tile: TileType;
-    playersOnTile: import('@/store/gameStore').Player[];
+    playersOnTile: import('@/types/game').Player[];
     orientation?: 'bottom' | 'left' | 'top' | 'right';
 }
 

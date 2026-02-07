@@ -1,5 +1,5 @@
 'use client';
-import { useGameStore, Player } from '@/store/gameStore';
+import { useGameStore } from '@/store/gameStore';
 import { Tile } from './Tile';
 import { useShallow } from 'zustand/react/shallow';
 import { getGridSize, getTileGridArea } from '@/lib/boardUtils';
