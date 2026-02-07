@@ -44,6 +44,16 @@ Constraints:
 
 const BATCH_SIZE = 2; // Process 2 items per LLM call
 
+// Fisher-Yates shuffle algorithm
+function shuffleArray<T>(array: T[]): T[] {
+    const shuffled = [...array];
+    for (let i = shuffled.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+    }
+    return shuffled;
+}
+
 export async function processNewsItems(rawNews: any[]): Promise<NewsCard[]> {
     // Split into batches for parallel processing
     const batches: any[][] = [];
@@ -58,8 +68,9 @@ export async function processNewsItems(rawNews: any[]): Promise<NewsCard[]> {
         batches.map((batch, batchIndex) => processBatch(batch, batchIndex * BATCH_SIZE))
     );
 
-    // Flatten results
-    return batchResults.flat();
+    // Flatten results and shuffle
+    const allNews = batchResults.flat();
+    return shuffleArray(allNews);
 }
 
 async function processBatch(batchNews: any[], startIndex: number): Promise<NewsCard[]> {
