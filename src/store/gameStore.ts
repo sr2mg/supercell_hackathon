@@ -212,6 +212,7 @@ export const useGameStore = create<GameState>((set, get) => ({
         let newBoard = [...get().board];
         let lastDownTag: Tag | null = null;
         let effectTag: Tag | null = null;
+        let impactText = '';
 
         if (nextNews.type === 'MARKET' && nextNews.tag) {
             // MARKET news: use the LLM-assigned tag
@@ -279,6 +280,15 @@ export const useGameStore = create<GameState>((set, get) => ({
                     previousPrice: asset.price
                 };
             });
+            const tagLabel = effectTag === 'AI' ? 'AI Agent'
+                : effectTag === 'CHIPS' ? 'Chips'
+                    : effectTag === 'ENERGY' ? 'Energy'
+                        : effectTag === 'GOV' ? 'Government'
+                            : effectTag === 'CRYPTO' ? 'Crypto'
+                                : 'Media';
+            const directionText = isUp ? 'surge' : 'sink';
+            const priceDelta = isUp ? `+${noiseAmount}` : `-${noiseAmount}`;
+            impactText = `${tagLabel} stocks ${directionText} — price ${priceDelta}`;
         } else {
             // 効果なしの場合もpreviousリセット
             newBoard = newBoard.map(asset => ({
@@ -286,13 +296,14 @@ export const useGameStore = create<GameState>((set, get) => ({
                 previousDividend: asset.dividend,
                 previousPrice: asset.price
             }));
+            impactText = 'Market holds steady — no sector moves';
         }
 
         // Apply Bankruptcy & IPO Rules
         const applied = applyBankruptcyAndIpo(newBoard, get().ipoIndex);
 
         set(state => ({
-            currentNews: nextNews,
+            currentNews: { ...nextNews, impactText },
             newsQueue: remainingQueue,
             newsLog: [nextNews, ...state.newsLog],
             board: applied.board,

@@ -14,4 +14,5 @@ export interface NewsCard {
     description?: string; // Original article description from RSS
     direction: NewsDirection | null;
     url?: string; // BBC article URL
+    impactText?: string; // English impact sentence shown in UI
 }

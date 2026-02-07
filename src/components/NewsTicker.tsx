@@ -64,6 +64,7 @@ export function NewsTicker() {
                             title={activeNews.title || activeNews.sourceTitle || 'News'}
                             subtitle={activeNews.titleEn || null}
                             reason={activeNews.reason || activeNews.description || null}
+                            impact={activeNews.impactText || null}
                             tagLabel={activeNews.tag || (isMarket ? 'MARKET' : 'NOISE')}
                             direction={activeNews.direction || null}
                             size="lg"

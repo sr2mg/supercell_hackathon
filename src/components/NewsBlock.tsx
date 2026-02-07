@@ -4,6 +4,7 @@ interface NewsBlockProps {
     title: string;
     subtitle?: string | null;
     reason?: string | null;
+    impact?: string | null;
     tagLabel?: string | null;
     direction?: 'UP' | 'DOWN' | null;
     size?: 'md' | 'lg';
@@ -13,6 +14,7 @@ export function NewsBlock({
     title,
     subtitle,
     reason,
+    impact,
     tagLabel,
     direction,
     size = 'lg',
@@ -33,7 +35,7 @@ export function NewsBlock({
                 className="absolute left-0 top-[13.5%] h-[28.5%] w-[56.57%]"
                 style={{ backgroundColor: tagLabel === 'NOISE' ? '#1186E4' : '#EB562B' }}
             />
-            <div className="absolute left-[4%] right-[6%] top-[52%]">
+            <div className="absolute left-[4%] right-[6%] top-[46%]">
                 <div className="flex items-start justify-between gap-3">
                     <div className="min-w-0">
                         <div className={clsx(
@@ -56,6 +58,14 @@ export function NewsBlock({
                                 size === 'lg' ? "text-xs md:text-sm" : "text-[10px] md:text-sm"
                             )}>
                                 {reason}
+                            </div>
+                        )}
+                        {impact && (
+                            <div className={clsx(
+                                "text-black mt-2 font-black uppercase tracking-widest",
+                                size === 'lg' ? "text-base md:text-2xl" : "text-sm md:text-lg"
+                            )}>
+                                {impact}
                             </div>
                         )}
                     </div>
