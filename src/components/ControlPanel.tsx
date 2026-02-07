@@ -4,7 +4,8 @@ import { useShallow } from 'zustand/react/shallow';
 import { SkipForward, DollarSign } from 'lucide-react';
 import clsx from 'clsx';
 import type { Asset, Tag } from '@/data/boardData';
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import { playSound } from '@/lib/sound';
 
 export function ControlPanel() {
     const {
@@ -42,6 +43,37 @@ export function ControlPanel() {
 
     const [isSellMode, setIsSellMode] = useState(false);
     const [sellAmounts, setSellAmounts] = useState<Record<number, number>>({});
+    const didInit = useRef(false);
+    const prevRolling = useRef(isRolling);
+    const prevHasRolled = useRef(hasRolled);
+    const prevPlayerIndex = useRef(activePlayerIndex);
+    const prevTurn = useRef(turnCount);
+
+    useEffect(() => {
+        if (!didInit.current) {
+            didInit.current = true;
+            return;
+        }
+        if (activePlayerIndex !== prevPlayerIndex.current || turnCount !== prevTurn.current) {
+            playSound('turn-start', 0.5);
+        }
+        prevPlayerIndex.current = activePlayerIndex;
+        prevTurn.current = turnCount;
+    }, [activePlayerIndex, turnCount]);
+
+    useEffect(() => {
+        if (isRolling && !prevRolling.current) {
+            playSound('dice', 0.6);
+        }
+        prevRolling.current = isRolling;
+    }, [isRolling]);
+
+    useEffect(() => {
+        if (hasRolled && !prevHasRolled.current) {
+            playSound('moving', 0.45);
+        }
+        prevHasRolled.current = hasRolled;
+    }, [hasRolled]);
 
     // Initialize sell amounts when entering sell mode
     const handleEnterSellMode = () => {

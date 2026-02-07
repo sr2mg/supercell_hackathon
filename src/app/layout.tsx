@@ -26,7 +26,7 @@ const lilitaOne = Lilita_One({
 });
 
 export const metadata: Metadata = {
-  title: "Newsopoly",
+  title: "STOP the PRESSES!",
   description: "A news-based board game",
 };
 

@@ -41,7 +41,7 @@ export function Board() {
                 >
                     <img
                         src="/logo-s.png"
-                        alt="Newsopoly"
+                        alt="STOP the PRESSES!"
                         className="w-2/3 max-w-[520px] h-auto"
                     />
                 </div>

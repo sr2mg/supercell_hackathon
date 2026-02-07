@@ -11,6 +11,7 @@ import {
     sellSharesForCash
 } from '@/lib/stock/stockRules';
 import { shouldComputerBuy } from '@/lib/players/playerRules';
+import { playSound } from '@/lib/sound';
 
 export { canBuyAsset } from '@/lib/stock/stockRules';
 
@@ -492,6 +493,8 @@ export const useGameStore = create<GameState>((set, get) => ({
         });
 
         const applied = applyBankruptcyAndIpo(sale.board, get().ipoIndex);
+        playSound('share-pay', 0.5);
+        playSound('share-gain', 0.5);
         set({ players: distributedPlayers, board: applied.board, ipoIndex: applied.ipoIndex });
     }
 }));

@@ -3,6 +3,7 @@ import { useGameStore } from '@/store/gameStore';
 import { useShallow } from 'zustand/react/shallow';
 import { useEffect, useState } from 'react';
 import { NewsBlock } from './NewsBlock';
+import { playSound } from '@/lib/sound';
 
 export function NewsTicker() {
     const { currentNews, newsLog, fetchNews, newsQueue } = useGameStore(useShallow(state => ({
@@ -24,6 +25,16 @@ export function NewsTicker() {
     useEffect(() => {
         if (currentNews) {
             setVisible(true);
+            if (currentNews.type === 'MARKET') {
+                playSound('breaking-news', 0.6);
+            } else {
+                playSound('negative', 0.4);
+            }
+            if (currentNews.direction === 'UP') {
+                playSound('positive', 0.5);
+            } else if (currentNews.direction === 'DOWN') {
+                playSound('negative', 0.5);
+            }
             const timer = setTimeout(() => setVisible(false), 3000);
             return () => clearTimeout(timer);
         }

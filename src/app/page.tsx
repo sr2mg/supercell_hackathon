@@ -7,6 +7,7 @@ import { ResultModal } from "@/components/ResultModal";
 import { HowToPlay } from "@/components/HowToPlay";
 import { useGameStore } from "@/store/gameStore";
 import { useEffect, useState } from "react";
+import { playBgm } from "@/lib/sound";
 
 export default function Home() {
   const isNewsReady = useGameStore(state => state.isNewsReady);
@@ -22,6 +23,19 @@ export default function Home() {
   useEffect(() => {
     fetchNews({ mode: 'initial', initialCount: 1, chunkSize: 5 });
   }, [fetchNews]);
+
+  useEffect(() => {
+    if (!hasStarted) {
+      playBgm('basic-bgm', 0.35);
+      const resume = () => playBgm('basic-bgm', 0.35);
+      window.addEventListener('pointerdown', resume, { once: true });
+      window.addEventListener('keydown', resume, { once: true });
+      return () => {
+        window.removeEventListener('pointerdown', resume);
+        window.removeEventListener('keydown', resume);
+      };
+    }
+  }, [hasStarted]);
 
   if (!hasStarted) {
     if (showIntro) {
@@ -50,7 +64,7 @@ export default function Home() {
           <div className="flex flex-col items-center justify-center gap-10">
             <img
               src="/logo-s.png"
-              alt="Newsopoly"
+              alt="STOP the PRESSES!"
               className="w-[420px] max-w-[80vw] h-auto"
             />
             <div className="flex flex-col items-center gap-3">
