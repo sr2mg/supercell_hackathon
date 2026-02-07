@@ -49,15 +49,28 @@ export function KomaTile({
                 {/* Bottom White Box */}
                 <rect x="5" y="179" width="290" height="116" fill="white" />
 
-                {/* Name */}
-                <text
-                    x="22"
-                    y="110"
-                    className="fill-black text-6xl tracking-tight uppercase"
-                    style={{ fontFamily: 'var(--font-lilita-one)', fontSize: '50px' }}
-                >
-                    {name}
-                </text>
+                {/* Name (wrapped) */}
+                <foreignObject x="22" y="60" width="256" height="55">
+                    <div
+                        xmlns="http://www.w3.org/1999/xhtml"
+                        style={{
+                            fontFamily: 'var(--font-lilita-one)',
+                            fontSize: '30px',
+                            fontWeight: 400,
+                            lineHeight: '1',
+                            letterSpacing: '-0.02em',
+                            textTransform: 'uppercase',
+                            color: '#000',
+                            display: '-webkit-box',
+                            WebkitLineClamp: 2,
+                            WebkitBoxOrient: 'vertical',
+                            overflow: 'hidden',
+                            wordBreak: 'break-word'
+                        }}
+                    >
+                        {name}
+                    </div>
+                </foreignObject>
 
                 {/* Tag Pill */}
                 <rect x="22" y="127" width="115" height="31" rx="15.5" stroke="black" strokeWidth="4" fill="none" />
