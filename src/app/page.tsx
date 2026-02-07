@@ -16,6 +16,7 @@ export default function Home() {
   const players = useGameStore(state => state.players);
   const board = useGameStore(state => state.board);
   const [hasStarted, setHasStarted] = useState(false);
+  const [showIntro, setShowIntro] = useState(false);
 
   // Prefetch news on mount
   useEffect(() => {
@@ -23,31 +24,60 @@ export default function Home() {
   }, [fetchNews]);
 
   if (!hasStarted) {
-    return (
-      <main className="min-h-screen bg-[#efede6] flex flex-col items-center justify-center">
-        <div className="flex flex-col items-center justify-center gap-10">
-          <img
-            src="/logo-s.png"
-            alt="Newsopoly"
-            className="w-[420px] max-w-[80vw] h-auto"
-          />
-          <div className="flex flex-col items-center gap-3">
+    if (showIntro) {
+      return (
+        <main className="min-h-screen bg-[#efede6] flex items-center justify-center px-6">
+          <div className="w-full max-w-[1200px] flex flex-col items-center gap-10">
+            <img
+              src="/description.svg"
+              alt="How to Play"
+              className="w-full max-w-[1100px] h-auto"
+            />
             <button
-              onClick={() => {
-                if (isNewsReady) setHasStarted(true);
-              }}
-              className="px-10 py-3 rounded-full text-2xl tracking-wide transition-all disabled:opacity-40 disabled:cursor-not-allowed bg-black text-white"
+              onClick={() => setShowIntro(false)}
+              className="px-10 py-3 rounded-full text-2xl tracking-wide bg-black text-white"
               style={{ fontFamily: 'var(--font-lilita-one)' }}
-              disabled={!isNewsReady}
             >
-              MARKET OPEN
+              BACK
             </button>
-            <div className="text-black text-xl tracking-widest">
-              PRESS TO START
-            </div>
           </div>
-          <div className="text-black/60 text-sm tracking-wide">
-            {isNewsReady ? 'Ready.' : 'Loading market news...'}
+        </main>
+      );
+    }
+    return (
+      <main className="min-h-screen bg-[#efede6] flex items-center justify-center px-6">
+        <div className="w-full max-w-[900px] flex flex-col items-center justify-center gap-10">
+          <div className="flex flex-col items-center justify-center gap-10">
+            <img
+              src="/logo-s.png"
+              alt="Newsopoly"
+              className="w-[420px] max-w-[80vw] h-auto"
+            />
+            <div className="flex flex-col items-center gap-3">
+              <button
+                onClick={() => {
+                  if (isNewsReady) setHasStarted(true);
+                }}
+                className="px-10 py-3 rounded-full text-2xl tracking-wide transition-all disabled:opacity-40 disabled:cursor-not-allowed bg-black text-white"
+                style={{ fontFamily: 'var(--font-lilita-one)' }}
+                disabled={!isNewsReady}
+              >
+                MARKET OPEN
+              </button>
+              <div className="text-black text-xl tracking-widest">
+                PRESS TO START
+              </div>
+            </div>
+            <div className="text-black/60 text-sm tracking-wide">
+              {isNewsReady ? 'Ready.' : 'Loading market news...'}
+            </div>
+            <button
+              onClick={() => setShowIntro(true)}
+              className="text-black underline text-sm tracking-widest"
+              style={{ fontFamily: 'var(--font-lilita-one)' }}
+            >
+              HOW TO PLAY
+            </button>
           </div>
         </div>
       </main>
