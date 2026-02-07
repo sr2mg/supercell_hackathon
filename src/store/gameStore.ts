@@ -182,7 +182,8 @@ export const useGameStore = create<GameState>((set, get) => ({
         });
 
         if (players[nextIndex].isComputer) {
-            setTimeout(() => get().rollDice(), 1000);
+            // Wait for news overlay to finish (3s) before rolling
+            setTimeout(() => get().rollDice(), 3500);
         }
     },
 
