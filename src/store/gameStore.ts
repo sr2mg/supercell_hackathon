@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { INITIAL_BOARD, Asset, Tag } from '../data/boardData';
 import type { Player } from '@/types/game';
+import { NewsCard } from '@/lib/types';
 import { applyBankruptcyAndIpo } from '@/lib/ipo/ipoRules';
 import { SHARE_PRICE } from '@/lib/stock/stockConstants';
 import {
@@ -13,13 +14,6 @@ import { shouldComputerBuy } from '@/lib/players/playerRules';
 
 export { canBuyAsset } from '@/lib/stock/stockRules';
 
-export interface NewsEffect {
-    title: string;
-    description: string;
-    type: 'RENT_HIKE' | 'PRICE_DROP' | 'UTILITY_FAIL' | 'NONE';
-    multiplier?: number;
-}
-
 interface GameState {
     players: Player[];
     activePlayerIndex: number;
@@ -27,9 +21,9 @@ interface GameState {
     board: Asset[];
     dice: [number, number];
     isRolling: boolean;
-    currentNews: NewsEffect | null;
-    newsQueue: NewsEffect[];
-    newsLog: NewsEffect[];
+    currentNews: NewsCard | null; // Changed from NewsEffect
+    newsQueue: NewsCard[];       // Changed from NewsEffect
+    newsLog: NewsCard[];         // Changed from NewsEffect
     lastDownTag: Tag | null;
     ipoIndex: number;
     hasRolled: boolean;
@@ -47,10 +41,18 @@ interface GameState {
     resolveTileEffect: (tile: Asset, player: Player) => void;
 }
 
-const MOCK_NEWS: NewsEffect[] = [
-    { title: "Central Bank Hikes Rates", description: "Rents increase by 50%!", type: 'RENT_HIKE', multiplier: 1.5 },
-    { title: "Market Crash!", description: "Property prices drop by 50%.", type: 'PRICE_DROP', multiplier: 0.5 },
-    { title: "Blackout!", description: "Utilities are offline. No rent for them.", type: 'UTILITY_FAIL', multiplier: 0 },
+const MOCK_NEWS: NewsCard[] = [
+    {
+        id: 'mock-1',
+        sourceTitle: 'System',
+        type: 'MARKET',
+        tag: 'GOV',
+        titleJa: '中央銀行が金利引き上げ',
+        titleEn: 'Central Bank Hikes Rates',
+        reasonJa: 'インフレ抑制のため。',
+        reasonEn: 'To curb inflation.',
+        direction: 'UP'
+    }
 ];
 
 
@@ -161,28 +163,47 @@ export const useGameStore = create<GameState>((set, get) => ({
             get().fetchNews();
         }
 
-        // If completely empty, try to fetch/wait? 
-        // For simplicity, if empty, we might skip update or use fallback immediately if fetch feels too slow.
-        // But since we trigger fetch on init, it should be fine.
+        const fallbackNews = newsQueue.length > 0 ? newsQueue[0] : MOCK_NEWS[0];
+        // If queue is empty (fetch failed?), recycle mock or just use what we have
+        // Ideally we should always have news.
 
-        if (newsQueue.length > 0) {
-            const [nextNews, ...remainingQueue] = newsQueue;
-            set(state => {
-                const applied = applyBankruptcyAndIpo(state.board, state.ipoIndex);
-                return {
-                    currentNews: nextNews,
-                    newsQueue: remainingQueue,
-                    newsLog: [nextNews, ...state.newsLog],
-                    board: applied.board,
-                    ipoIndex: applied.ipoIndex
-                };
+        const nextNews = newsQueue.length > 0 ? newsQueue[0] : fallbackNews;
+        const remainingQueue = newsQueue.length > 0 ? newsQueue.slice(1) : [];
+
+        // Apply News Effect to Board
+        let newBoard = [...get().board];
+        let lastDownTag: Tag | null = null;
+
+        if (nextNews.type === 'MARKET' && nextNews.tag) {
+            const amount = 100; // Fixed amount for now
+            const isUp = nextNews.direction === 'UP';
+
+            if (!isUp) {
+                lastDownTag = nextNews.tag;
+            }
+
+            newBoard = newBoard.map(asset => {
+                if (asset.tag === nextNews.tag && !asset.isBankrupt && !asset.isPayday) {
+                    const change = isUp ? amount : -amount;
+                    const newDividend = Math.max(0, asset.dividend + change);
+                    // 0 means bankrupt effectively, but we handle explicit bankruptcy next
+                    return { ...asset, dividend: newDividend };
+                }
+                return asset;
             });
-        } else {
-            // If truly empty, maybe fetch synchronously-ish or await?
-            // But valid flow is: background fetch should have caught up.
-            // If not, we just don't update news this micro-turn.
-            get().fetchNews();
         }
+
+        // Apply Bankruptcy & IPO Rules
+        const applied = applyBankruptcyAndIpo(newBoard, get().ipoIndex);
+
+        set(state => ({
+            currentNews: nextNews,
+            newsQueue: remainingQueue,
+            newsLog: [nextNews, ...state.newsLog],
+            board: applied.board,
+            ipoIndex: applied.ipoIndex,
+            lastDownTag: lastDownTag || state.lastDownTag // Update only if meaningful? Or just track latest crash
+        }));
     },
 
     fetchNews: async () => {
