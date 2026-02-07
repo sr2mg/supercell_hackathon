@@ -26,10 +26,8 @@ Output JSON Structure:
     "sourceTitle": "Original Title",
     "type": "MARKET" | "NOISE",
     "tag": "AI" | "CHIPS" | "ENERGY" | "GOV" | "CRYPTO" | "MEDIA" | null,
-    "titleJa": "Japanese Title (Short, Punchy)",
-    "titleEn": "English Title (Short)",
-    "reasonJa": "Why it affects the market (Japanese, 1 sentence)",
-    "reasonEn": "Why it affects the market (English, 1 sentence)",
+    "title": "Short, Punchy Title",
+    "reason": "Why it affects the market (1 sentence)",
     "direction": "UP" | "DOWN"
   }
 ]
@@ -91,10 +89,8 @@ async function processBatch(batchNews: any[], startIndex: number): Promise<NewsC
             sourceTitle: item.sourceTitle || batchNews[index]?.title || 'Unknown Source',
             type: asNewsType(item.type),
             tag: asTag(item.tag),
-            titleJa: item.titleJa,
-            titleEn: item.titleEn,
-            reasonJa: item.reasonJa,
-            reasonEn: item.reasonEn,
+            title: item.title,
+            reason: item.reason,
             direction: asDirection(item.direction),
             url: batchNews[index]?.link || undefined
         }));

@@ -48,10 +48,8 @@ const MOCK_NEWS: NewsCard[] = [
         sourceTitle: 'System',
         type: 'MARKET',
         tag: 'GOV',
-        titleJa: '中央銀行が金利引き上げ',
-        titleEn: 'Central Bank Hikes Rates',
-        reasonJa: 'インフレ抑制のため。',
-        reasonEn: 'To curb inflation.',
+        title: 'Central Bank Hikes Rates',
+        reason: 'To curb inflation.',
         direction: 'UP'
     }
 ];

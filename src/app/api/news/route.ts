@@ -39,10 +39,8 @@ export async function GET() {
                 sourceTitle: 'System',
                 type: 'NOISE',
                 tag: null,
-                titleJa: '通信エラー',
-                titleEn: 'Connection Lost',
-                reasonJa: 'ニュース取得に失敗しました。ローカルバックアップを使用します。',
-                reasonEn: 'Failed to fetch news. Using local backup.',
+                title: 'Connection Lost',
+                reason: 'Failed to fetch news. Using local backup.',
                 direction: null
             },
             {
@@ -50,10 +48,8 @@ export async function GET() {
                 sourceTitle: 'System',
                 type: 'MARKET',
                 tag: 'GOV',
-                titleJa: '不況モード',
-                titleEn: 'Recession Mode',
-                reasonJa: '詳細データがありません。',
-                reasonEn: 'No detailed data available.',
+                title: 'Recession Mode',
+                reason: 'No detailed data available.',
                 direction: 'DOWN'
             }
         ];

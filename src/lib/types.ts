@@ -9,10 +9,8 @@ export interface NewsCard {
     sourceTitle: string;
     type: NewsType;
     tag: Tag | null; // Null if NOISE (or random effect later)
-    titleJa: string;
-    titleEn: string;
-    reasonJa: string;
-    reasonEn: string;
+    title: string;
+    reason: string;
     direction: NewsDirection | null;
     url?: string; // BBC article URL
 }

@@ -38,10 +38,8 @@ export function NewsTicker() {
         sourceTitle: 'System',
         type: 'NOISE',
         tag: null,
-        titleJa: '市場は待機中...',
-        titleEn: 'Market Waiting...',
-        reasonJa: 'ニュースを取得しています。',
-        reasonEn: 'Fetching news...',
+        title: 'Market Waiting...',
+        reason: 'Fetching news...',
         direction: null,
         url: undefined
     };
@@ -71,7 +69,7 @@ export function NewsTicker() {
 
                     <div className="flex flex-col flex-1">
                         <h2 className="text-lg md:text-2xl font-black tracking-tighter flex items-center gap-3">
-                            {activeNews.titleEn}
+                            {activeNews.title}
                             {isMarket && isUp && <TrendingUp className="text-green-400 w-6 h-6" />}
                             {isMarket && isDown && <TrendingDown className="text-red-400 w-6 h-6" />}
                             {!isMarket && <Radio className="text-slate-400 w-5 h-5" />}
@@ -83,7 +81,7 @@ export function NewsTicker() {
                                 </span>
                             )}
                             <p className="text-slate-300 text-xs md:text-sm font-medium">
-                                {activeNews.reasonEn}
+                                {activeNews.reason}
                             </p>
                         </div>
                     </div>
@@ -97,28 +95,18 @@ export function NewsTicker() {
             </div>
 
             {/* Accordion Expanded Content */}
-            {expanded && (
+            {expanded && activeNews.url && (
                 <div className="bg-slate-800/50 border-t border-slate-700 p-4 animate-in slide-in-from-top-2 duration-200">
-                    <div className="flex flex-col gap-3">
-                        <div>
-                            <div className="text-xs text-slate-500 uppercase tracking-wide mb-1">日本語</div>
-                            <h3 className="text-lg font-bold text-slate-100">{activeNews.titleJa}</h3>
-                            <p className="text-sm text-slate-300 mt-1">{activeNews.reasonJa}</p>
-                        </div>
-
-                        {activeNews.url && (
-                            <a
-                                href={activeNews.url}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                onClick={(e) => e.stopPropagation()}
-                                className="inline-flex items-center gap-2 text-blue-400 hover:text-blue-300 text-sm font-medium transition-colors w-fit"
-                            >
-                                <ExternalLink className="w-4 h-4" />
-                                Read full article on BBC
-                            </a>
-                        )}
-                    </div>
+                    <a
+                        href={activeNews.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        onClick={(e) => e.stopPropagation()}
+                        className="inline-flex items-center gap-2 text-blue-400 hover:text-blue-300 text-sm font-medium transition-colors w-fit"
+                    >
+                        <ExternalLink className="w-4 h-4" />
+                        Read full article on BBC
+                    </a>
                 </div>
             )}
 
@@ -139,7 +127,7 @@ export function NewsTicker() {
                             )}>
                                 [{news.tag || 'GENERAL'}]
                             </span>
-                            <strong className="text-slate-200">{news.titleEn}</strong>
+                            <strong className="text-slate-200">{news.title}</strong>
                             {news.direction === 'UP' && <span className="text-green-500 font-bold">▲UP</span>}
                             {news.direction === 'DOWN' && <span className="text-red-500 font-bold">▼DOWN</span>}
                         </span>
