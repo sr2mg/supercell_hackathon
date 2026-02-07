@@ -134,8 +134,8 @@ export function ControlPanel() {
                     const playerNetWorth = p.money + playerStockValue;
                     return (
                         <div key={p.id} className={clsx(
-                            "p-2 rounded transition-colors",
-                            p.id === activePlayer.id ? 'bg-slate-100 ring-1 ring-slate-300' : ''
+                            "p-2 rounded transition-colors relative group cursor-pointer",
+                            p.id === activePlayer.id ? 'bg-slate-100 ring-1 ring-slate-300' : 'hover:bg-slate-50'
                         )}>
                             <div className="flex justify-between items-center">
                                 <div className="flex items-center gap-2">
@@ -147,6 +147,30 @@ export function ControlPanel() {
                             <div className="flex justify-end gap-3 mt-1 text-[10px] text-slate-500">
                                 <span>Cash: ${p.money}</span>
                                 <span>Stock: ${playerStockValue}</span>
+                            </div>
+                            {/* Holdings Tooltip */}
+                            <div className="absolute left-0 right-0 top-full mt-1 z-50 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 pointer-events-none">
+                                <div className="bg-slate-800 text-white text-[11px] rounded-lg p-3 shadow-xl">
+                                    <div className="font-semibold mb-2 text-slate-200">{p.name}&apos;s Holdings</div>
+                                    {playerHoldings.length === 0 ? (
+                                        <div className="text-slate-400">No shares yet</div>
+                                    ) : (
+                                        <div className="space-y-1.5">
+                                            {playerHoldings.map(h => (
+                                                <div key={h.id} className="flex items-center justify-between gap-4">
+                                                    <span className="truncate max-w-[120px] text-slate-100">{h.name}</span>
+                                                    <span className="font-mono text-slate-300 whitespace-nowrap">
+                                                        {h.shares} sh · ${h.dividend} rent · ${h.shares * SHARE_VALUE}
+                                                    </span>
+                                                </div>
+                                            ))}
+                                            <div className="border-t border-slate-600 pt-1.5 mt-1.5 flex justify-between font-semibold">
+                                                <span>Total Stock Value</span>
+                                                <span className="font-mono">${playerStockValue}</span>
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
                             </div>
                         </div>
                     );
