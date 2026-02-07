@@ -1,6 +1,6 @@
 export function HowToPlay() {
     return (
-        <div className="bg-transparent border-[5px] border-black rounded-[73px] w-full h-full p-6 text-slate-800">
+        <div className="bg-transparent border-[5px] border-black rounded-2xl w-full h-full p-6 text-slate-800">
             <div className="mb-4 text-center">
                 <h4
                     className="text-black"
