@@ -7,6 +7,7 @@ interface KomaTileProps {
     name: string;
     tag: Tag;
     value: number;
+    price: number;
     colorHex: string;
     shareholders?: Array<{ playerId: number; shares: number }>;
     playersOnTile?: Player[];
@@ -24,6 +25,7 @@ export function KomaTile({
     name,
     tag,
     value,
+    price,
     colorHex,
     shareholders = [],
     playersOnTile = [],
@@ -94,24 +96,15 @@ export function KomaTile({
                     {tag}
                 </text>
 
-                {/* Price/Value */}
-                {/* Dollar Sign */}
+                {/* Dividend / Price */}
                 <text
-                    x="30"
+                    x="150"
                     y="270"
+                    textAnchor="middle"
                     className="fill-black"
-                    style={{ fontFamily: 'var(--font-lilita-one)', fontSize: '50px' }}
+                    style={{ fontFamily: 'var(--font-lilita-one)', fontSize: '46px', letterSpacing: '0.02em' }}
                 >
-                    $
-                </text>
-                {/* Value amount */}
-                <text
-                    x="65"
-                    y="270"
-                    className="fill-black"
-                    style={{ fontFamily: 'var(--font-lilita-one)', fontSize: '70px', letterSpacing: '0.05em' }}
-                >
-                    {value}
+                    D{value} / ${price}
                 </text>
 
                 {/* Slot Circles */}
