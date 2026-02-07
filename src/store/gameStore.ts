@@ -256,12 +256,12 @@ export const useGameStore = create<GameState>((set, get) => ({
                     const change = isUp ? noiseAmount : -noiseAmount;
                     const newDividend = Math.max(0, asset.dividend + change);
 
-                    // Stock Price Logic: Change is 2x Dividend Change
+                    // Stock Price Logic: clamp(dividend * 2, 200, 800)
                     // If Dividend becomes 0 (Bankrupt), Price becomes 0
                     let newPrice = 0;
                     if (newDividend > 0) {
-                        const priceChange = change * 2;
-                        newPrice = Math.max(0, asset.price + priceChange);
+                        const rawPrice = newDividend * 2;
+                        newPrice = Math.min(800, Math.max(200, rawPrice));
                     }
 
                     return {
