@@ -181,41 +181,61 @@ export function ControlPanel() {
                     const playerHoldings = getHoldings(board, p.id);
                     const playerStockValue = playerHoldings.reduce((acc, h) => acc + (h.shares * h.price), 0);
                     const playerNetWorth = p.money + playerStockValue;
+
                     return (
-                        <div key={p.id} className={clsx(
-                            "p-2 rounded transition-colors relative group cursor-pointer",
-                            p.id === activePlayer.id ? 'bg-slate-100 ring-1 ring-slate-300' : 'hover:bg-slate-50'
-                        )}>
-                            <div className="flex justify-between items-center">
-                                <div className="flex items-center gap-2">
-                                    <div className="w-3 h-3 rounded-full shadow-sm border border-black/10" style={{ backgroundColor: p.color }} />
-                                    <span className="text-sm font-medium">{p.name}</span>
-                                </div>
-                                <div className="font-mono text-sm font-semibold">${playerNetWorth}</div>
+                        <div key={p.id} className="group relative flex items-center gap-3 py-2">
+                            {/* Player Token */}
+                            <div className="relative shrink-0">
+                                {!p.isComputer && (
+                                    <div
+                                        className="absolute -top-4 left-1/2 -translate-x-1/2 text-xs text-black tracking-widest"
+                                        style={{ fontFamily: 'var(--font-lilita-one)' }}
+                                    >
+                                        YOU
+                                    </div>
+                                )}
+                                <div
+                                    className="w-10 h-10 rounded-full border-[3px] border-black"
+                                    style={{ backgroundColor: p.color }}
+                                />
                             </div>
-                            <div className="flex justify-end gap-3 mt-1 text-[10px] text-slate-500">
-                                <span>Cash: ${p.money}</span>
-                                <span>Stock: ${playerStockValue}</span>
+
+                            {/* Net Worth */}
+                            <div className="flex items-baseline gap-1 text-black">
+                                <span className="text-xl" style={{ fontFamily: 'var(--font-lilita-one)' }}>$</span>
+                                <span className="text-5xl leading-none" style={{ fontFamily: 'var(--font-lilita-one)' }}>{playerNetWorth}</span>
                             </div>
-                            {/* Holdings Tooltip */}
+
+                            {/* Breakdown */}
+                            <div
+                                className="grid grid-cols-[auto_1fr] gap-x-3 text-xl leading-none text-black ml-auto"
+                                style={{ fontFamily: 'var(--font-lilita-one)' }}
+                            >
+                                <span className="text-right">CASH</span>
+                                <span className="text-left min-w-[3ch]">{p.money}</span>
+
+                                <span className="text-right">STOCK</span>
+                                <span className="text-left min-w-[3ch]">{playerStockValue}</span>
+                            </div>
+
+                            {/* Holdings Tooltip - Keeping functionality but hiding it visually from the main design */}
                             <div className="absolute left-0 right-0 top-full mt-1 z-50 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 pointer-events-none">
-                                <div className="bg-slate-800 text-white text-[11px] rounded-lg p-3 shadow-xl">
-                                    <div className="font-semibold mb-2 text-slate-200">{p.name}&apos;s Holdings</div>
+                                <div className="bg-slate-800 text-white text-[11px] rounded-lg p-3 shadow-xl border border-slate-700 w-64">
+                                    <div className="font-semibold mb-2 text-slate-200 font-sans">{p.name}&apos;s Holdings</div>
                                     {playerHoldings.length === 0 ? (
-                                        <div className="text-slate-400">No shares yet</div>
+                                        <div className="text-slate-400 font-sans">No shares yet</div>
                                     ) : (
-                                        <div className="space-y-1.5">
+                                        <div className="space-y-1.5 font-sans">
                                             {playerHoldings.map(h => {
                                                 const pnl = h.dividend - h.purchaseDividend;
                                                 return (
                                                     <div key={h.id} className="flex items-center justify-between gap-4">
-                                                        <span className="truncate max-w-[120px] text-slate-100">{h.name}</span>
+                                                        <span className="truncate flex-1 text-slate-100">{h.name}</span>
                                                         <span className="font-mono text-slate-300 whitespace-nowrap">
                                                             {h.shares}sh · D${h.dividend}{' '}
                                                             <span className={pnl >= 0 ? 'text-green-400' : 'text-red-400'}>
                                                                 ({pnl >= 0 ? '+' : ''}{pnl})
                                                             </span>
-                                                            {' '}· ${h.shares * h.price}
                                                         </span>
                                                     </div>
                                                 );
