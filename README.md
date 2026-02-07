@@ -1,5 +1,7 @@
 # STOP the PRESSES!
 
+![Screenshot](public/screen.png)
+
 STOP the PRESSES! is an AI‑native, news‑driven stock market board game. Real headlines are classified by an LLM and converted into market events that move dividends and share prices across six sectors. Players buy shares, collect payouts, and try to survive market chaos until a winner is decided.
 
 ## Game Summary
