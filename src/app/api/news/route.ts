@@ -21,8 +21,8 @@ export async function GET() {
             throw new Error('Invalid RSS structure');
         }
 
-        // Take top 20 items for processing
-        const topStories = items.slice(0, 20);
+        // Take top 10 items for processing
+        const topStories = items.slice(0, 10);
 
         // Process with LLM
         const processedNews: NewsCard[] = await processNewsItems(topStories);

@@ -27,6 +27,7 @@ interface GameState {
     lastDownTag: Tag | null;
     ipoIndex: number;
     hasRolled: boolean;
+    isNewsReady: boolean;
     winner: Player | null;
     winningReason: string | null;
 
@@ -90,6 +91,7 @@ export const useGameStore = create<GameState>((set, get) => ({
     dice: [1, 1],
     isRolling: false,
     hasRolled: false,
+    isNewsReady: false,
     currentNews: null,
     newsQueue: [],
     newsLog: [],
@@ -217,13 +219,16 @@ export const useGameStore = create<GameState>((set, get) => ({
             const newItems = Array.isArray(data) ? data : [];
 
             set(state => ({
-                newsQueue: [...state.newsQueue, ...newItems]
+                newsQueue: [...state.newsQueue, ...newItems],
+                isNewsReady: true
             }));
         } catch (err) {
             console.error("Failed to fetch news", err);
             // Fallback
+            console.warn("Using mock news as fallback");
             set(state => ({
-                newsQueue: [...state.newsQueue, ...MOCK_NEWS]
+                newsQueue: [...state.newsQueue, ...MOCK_NEWS],
+                isNewsReady: true
             }));
         }
     },

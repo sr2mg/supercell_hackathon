@@ -44,11 +44,30 @@ Constraints:
 - If it's strictly local or boring, make it NOISE.
 `;
 
+const BATCH_SIZE = 2; // Process 2 items per LLM call
+
 export async function processNewsItems(rawNews: any[]): Promise<NewsCard[]> {
-    // 1. Prepare the input for LLM (limit to top 15-20 to save tokens/time if list is huge)
-    const newsInput = rawNews.map((item: any) => ({
+    // Split into batches for parallel processing
+    const batches: any[][] = [];
+    for (let i = 0; i < rawNews.length; i += BATCH_SIZE) {
+        batches.push(rawNews.slice(i, i + BATCH_SIZE));
+    }
+
+    console.log(`Processing ${rawNews.length} news items in ${batches.length} parallel batches...`);
+
+    // Process all batches in parallel
+    const batchResults = await Promise.all(
+        batches.map((batch, batchIndex) => processBatch(batch, batchIndex * BATCH_SIZE))
+    );
+
+    // Flatten results
+    return batchResults.flat();
+}
+
+async function processBatch(batchNews: any[], startIndex: number): Promise<NewsCard[]> {
+    const newsInput = batchNews.map((item: any) => ({
         title: item.title,
-        description: item.description?.substring(0, 200) || '', // Truncate long descriptions
+        description: item.description?.substring(0, 200) || '',
     }));
 
     const prompt = `
@@ -68,8 +87,8 @@ export async function processNewsItems(rawNews: any[]): Promise<NewsCard[]> {
 
         // Map to full NewsCard structure (add IDs)
         return processedItems.map((item: any, index: number) => ({
-            id: `news-${Date.now()}-${index}`,
-            sourceTitle: item.sourceTitle || rawNews[index]?.title || 'Unknown Source',
+            id: `news-${Date.now()}-${startIndex + index}`,
+            sourceTitle: item.sourceTitle || batchNews[index]?.title || 'Unknown Source',
             type: asNewsType(item.type),
             tag: asTag(item.tag),
             titleJa: item.titleJa,
@@ -77,12 +96,11 @@ export async function processNewsItems(rawNews: any[]): Promise<NewsCard[]> {
             reasonJa: item.reasonJa,
             reasonEn: item.reasonEn,
             direction: asDirection(item.direction),
-            url: rawNews[index]?.link || undefined
+            url: batchNews[index]?.link || undefined
         }));
 
     } catch (error) {
-        console.error('News Processing Error:', error);
-        // Fallback: return empty or basic processed items to prevent crash
+        console.error(`Batch processing error (starting at ${startIndex}):`, error);
         return [];
     }
 }

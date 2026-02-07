@@ -1,8 +1,32 @@
+'use client';
+
 import { Board } from "@/components/Board";
 import { ControlPanel } from "@/components/ControlPanel";
 import { NewsTicker } from "@/components/NewsTicker";
+import { useGameStore } from "@/store/gameStore";
+import { useEffect } from "react";
 
 export default function Home() {
+  const isNewsReady = useGameStore(state => state.isNewsReady);
+  const fetchNews = useGameStore(state => state.fetchNews);
+
+  // Prefetch news on mount
+  useEffect(() => {
+    fetchNews();
+  }, [fetchNews]);
+
+  if (!isNewsReady) {
+    return (
+      <main className="min-h-screen bg-slate-900 flex flex-col items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-16 w-16 border-4 border-slate-600 border-t-yellow-400 mx-auto mb-6"></div>
+          <h1 className="text-2xl font-bold text-white mb-2">NEWSOPOLY</h1>
+          <p className="text-slate-400 animate-pulse">Fetching latest market news...</p>
+        </div>
+      </main>
+    );
+  }
+
   return (
     <main className="min-h-screen bg-slate-100 flex flex-col">
       {/* Top: News Ticker */}
