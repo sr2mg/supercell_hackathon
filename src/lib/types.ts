@@ -11,6 +11,7 @@ export interface NewsCard {
     tag: Tag | null; // Null if NOISE (or random effect later)
     title: string;
     reason: string;
+    description?: string; // Original article description from RSS
     direction: NewsDirection | null;
     url?: string; // BBC article URL
 }

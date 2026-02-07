@@ -95,18 +95,25 @@ export function NewsTicker() {
             </div>
 
             {/* Accordion Expanded Content */}
-            {expanded && activeNews.url && (
+            {expanded && (activeNews.description || activeNews.url) && (
                 <div className="bg-slate-800/50 border-t border-slate-700 p-4 animate-in slide-in-from-top-2 duration-200">
-                    <a
-                        href={activeNews.url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        onClick={(e) => e.stopPropagation()}
-                        className="inline-flex items-center gap-2 text-blue-400 hover:text-blue-300 text-sm font-medium transition-colors w-fit"
-                    >
-                        <ExternalLink className="w-4 h-4" />
-                        Read full article on BBC
-                    </a>
+                    <div className="flex flex-col gap-3">
+                        {activeNews.description && (
+                            <p className="text-sm text-slate-300">{activeNews.description}</p>
+                        )}
+                        {activeNews.url && (
+                            <a
+                                href={activeNews.url}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                onClick={(e) => e.stopPropagation()}
+                                className="inline-flex items-center gap-2 text-blue-400 hover:text-blue-300 text-sm font-medium transition-colors w-fit"
+                            >
+                                <ExternalLink className="w-4 h-4" />
+                                Read full article on BBC
+                            </a>
+                        )}
+                    </div>
                 </div>
             )}
 

@@ -91,6 +91,7 @@ async function processBatch(batchNews: any[], startIndex: number): Promise<NewsC
             tag: asTag(item.tag),
             title: item.title,
             reason: item.reason,
+            description: batchNews[index]?.description || undefined,
             direction: asDirection(item.direction),
             url: batchNews[index]?.link || undefined
         }));
