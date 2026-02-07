@@ -14,10 +14,10 @@ interface KomaTileProps {
 }
 
 const defaultPlayerColors: Record<number, string> = {
-    0: 'bg-red-500',
-    1: 'bg-blue-500',
-    2: 'bg-green-500',
-    3: 'bg-yellow-500',
+    0: '#F5D304',
+    1: '#FDA3F5',
+    2: '#00E16D',
+    3: '#07A5E2',
 };
 
 export function KomaTile({
@@ -29,6 +29,14 @@ export function KomaTile({
     playersOnTile = [],
     playerColors = defaultPlayerColors,
 }: KomaTileProps) {
+    const filledSlots = shareholders
+        .flatMap(h => Array.from({ length: h.shares }).map(() => h.playerId))
+        .slice(0, 3);
+    const slotFills = [0, 1, 2].map((i) => {
+        const playerId = filledSlots[i];
+        return playerId !== undefined ? (playerColors[playerId] || '#FFFFFF') : '#FFFFFF';
+    });
+
     return (
         <div className={clsx(
             "relative select-none",
@@ -107,46 +115,10 @@ export function KomaTile({
                 </text>
 
                 {/* Slot Circles */}
-                <circle cx="169.5" cy="142.5" r="15.5" fill="white" stroke="black" strokeWidth="4" />
-                <circle cx="214.5" cy="142.5" r="15.5" fill="white" stroke="black" strokeWidth="4" />
-                <circle cx="258.5" cy="142.5" r="15.5" fill="white" stroke="black" strokeWidth="4" />
+                <circle cx="169.5" cy="142.5" r="15.5" fill={slotFills[0]} stroke="black" strokeWidth="4" />
+                <circle cx="214.5" cy="142.5" r="15.5" fill={slotFills[1]} stroke="black" strokeWidth="4" />
+                <circle cx="258.5" cy="142.5" r="15.5" fill={slotFills[2]} stroke="black" strokeWidth="4" />
             </svg>
-
-            {/* Shareholders (Using the slot circles positions) */}
-            {/* The SVG circles are at specific coords, we can place absolute divs over them or render SVG circles inside */}
-            {/* Let's render shareholder markers inside the SVG if possible, or overlay divs. */}
-            {/* Overlay Divs for Shareholders */}
-            <div className="absolute top-0 left-0 w-full h-full pointer-events-none">
-                {/* Map slots to shareholders based on index (max 3 slots shown efficiently) */}
-                {/* Slots: (169.5, 142.5), (214.5, 142.5), (258.5, 142.5) */}
-                {/* Convert SVG coords to percentages for responsiveness: 300x300 basis */}
-                {shareholders.slice(0, 3).map((h, i) => {
-                    const cx = [169.5, 214.5, 258.5][i];
-                    const cy = 142.5;
-                    const left = (cx / 300) * 100;
-                    const top = (cy / 300) * 100;
-                    const color = playerColors[h.playerId] || '#9ca3af'; // default gray-400 equivalent
-
-                    return (
-                        <div
-                            key={`sh-${i}`}
-                            className={clsx(
-                                "absolute w-[8%] h-[8%] rounded-full border-2 border-black transform -translate-x-1/2 -translate-y-1/2 flex items-center justify-center",
-                                !color.startsWith('#') && color
-                            )}
-                            style={{
-                                left: `${left}%`,
-                                top: `${top}%`,
-                                backgroundColor: color.startsWith('#') ? color : undefined
-                            }}
-                            title={`Shareholder: Player ${h.playerId} (${h.shares})`}
-                        >
-                            {/* Optional: Show share count if tiny text fits, or just color indicator */}
-                            {/* <span className="text-[0.4em] font-bold text-black">{h.shares}</span> */}
-                        </div>
-                    );
-                })}
-            </div>
 
             {/* Players on Tile (Standing) */}
             {/* Position them at bottom right or spread out? SVG has space at bottom right in white box? */}
