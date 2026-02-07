@@ -12,6 +12,7 @@ interface KomaTileProps {
     shareholders?: Array<{ playerId: number; shares: number }>;
     playersOnTile?: Player[];
     playerColors?: Record<number, string>;
+    previousPrice?: number;
 }
 
 const defaultPlayerColors: Record<number, string> = {
@@ -30,6 +31,7 @@ export function KomaTile({
     shareholders = [],
     playersOnTile = [],
     playerColors = defaultPlayerColors,
+    previousPrice,
 }: KomaTileProps) {
     const filledSlots = shareholders
         .flatMap(h => Array.from({ length: h.shares }).map(() => h.playerId))
@@ -38,6 +40,10 @@ export function KomaTile({
         const playerId = filledSlots[i];
         return playerId !== undefined ? (playerColors[playerId] || '#FFFFFF') : '#FFFFFF';
     });
+
+    const priceDiff = previousPrice !== undefined ? price - previousPrice : 0;
+    const isPositive = priceDiff > 0;
+    const isNegative = priceDiff < 0;
 
     return (
         <div className={clsx(
@@ -106,6 +112,24 @@ export function KomaTile({
                 >
                     D{value} / ${price}
                 </text>
+
+                {/* Price Fluctuation (if any) */}
+                {priceDiff !== 0 && (
+                    <text
+                        x="150"
+                        y="230"
+                        textAnchor="middle"
+                        className={isPositive ? "fill-green-600" : "fill-red-600"}
+                        style={{
+                            fontFamily: 'var(--font-lilita-one)',
+                            fontSize: '32px',
+                            fontWeight: 'bold',
+                            filter: 'drop-shadow(0px 1px 0px white)'
+                        }}
+                    >
+                        {isPositive ? '+' : ''}{priceDiff}
+                    </text>
+                )}
 
                 {/* Slot Circles */}
                 <circle cx="169.5" cy="142.5" r="15.5" fill={slotFills[0]} stroke="black" strokeWidth="4" />
