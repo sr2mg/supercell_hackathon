@@ -212,10 +212,10 @@ export function ControlPanel() {
                                 style={{ fontFamily: 'var(--font-lilita-one)' }}
                             >
                                 <span className="text-right">CASH</span>
-                                <span className="text-left min-w-[3ch]">{p.money}</span>
+                                <span className="text-right">{p.money}</span>
 
                                 <span className="text-right">STOCK</span>
-                                <span className="text-left min-w-[3ch]">{playerStockValue}</span>
+                                <span className="text-right">{playerStockValue}</span>
                             </div>
 
                             {/* Holdings Tooltip - Keeping functionality but hiding it visually from the main design */}
