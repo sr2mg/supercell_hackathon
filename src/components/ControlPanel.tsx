@@ -58,17 +58,12 @@ export function ControlPanel() {
     return (
         <div className="flex flex-col gap-4 bg-white p-6 rounded-xl shadow-lg border border-slate-200 w-full max-w-sm">
             {/* Header */}
-            <div className="flex justify-between items-center border-b pb-4">
-                <div>
-                    <h3 className="text-lg font-bold text-slate-800">Turn {turnCount}</h3>
-                    <p className="text-xs text-slate-500">Global Event Cycle: {3 - (turnCount % 3 === 0 ? 3 : turnCount % 3) + 1} turns left</p>
-                </div>
-                <div className="text-right">
-                    <div className="text-sm text-slate-500">Current Player</div>
-                    <div className="font-bold text-slate-800 flex items-center justify-end gap-2">
-                        <span>{activePlayer.name}</span>
-                        <div className="w-3 h-3 rounded-full border border-black/10 shadow-sm" style={{ backgroundColor: activePlayer.color }} />
-                    </div>
+            {/* Header */}
+            <div className="flex justify-center border-b pb-4">
+                <div className="bg-black text-white px-6 py-2 rounded-full shadow-lg transform -rotate-1">
+                    <h3 className="text-2xl tracking-widest leading-none" style={{ fontFamily: 'var(--font-lilita-one)' }}>
+                        TURN {turnCount}
+                    </h3>
                 </div>
             </div>
 
