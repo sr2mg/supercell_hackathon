@@ -84,7 +84,7 @@ export default function Home() {
               </div>
             </div>
             <div className="text-black/60 text-sm tracking-wide">
-              {isNewsReady ? 'Ready.' : 'Loading market news...'}
+              {isNewsReady ? 'Ready.' : <span className="animate-pulse">Loading market news...</span>}
             </div>
             <button
               onClick={() => setShowIntro(true)}
