@@ -1,5 +1,5 @@
 'use client';
-import { useGameStore, canBuyTile } from '@/store/gameStore';
+import { useGameStore, canBuyAsset } from '@/store/gameStore';
 import { useShallow } from 'zustand/react/shallow';
 import { Dice1, Dice2, Dice3, Dice4, Dice5, Dice6, SkipForward, DollarSign } from 'lucide-react';
 import clsx from 'clsx';
@@ -18,7 +18,7 @@ export function ControlPanel() {
         nextTurn,
         currentNews, // kept for future use context
         board,
-        buyProperty
+        buyShare
     } = useGameStore(useShallow(state => ({
         players: state.players,
         activePlayerIndex: state.activePlayerIndex,
@@ -30,13 +30,13 @@ export function ControlPanel() {
         nextTurn: state.nextTurn,
         currentNews: state.currentNews,
         board: state.board,
-        buyProperty: state.buyProperty
+        buyShare: state.buyShare
     })));
 
     const activePlayer = players[activePlayerIndex];
     const currentTile = board[activePlayer.position]; // Assuming direct index mapping for now (0-23)
 
-    const canBuy = canBuyTile(currentTile, activePlayer);
+    const canBuy = canBuyAsset(currentTile, activePlayer);
 
     return (
         <div className="flex flex-col gap-4 bg-white p-6 rounded-xl shadow-lg border border-slate-200 w-full max-w-sm">
@@ -70,10 +70,10 @@ export function ControlPanel() {
 
                 {canBuy && (
                     <button
-                        onClick={() => buyProperty(currentTile.id)}
+                        onClick={() => buyShare(currentTile.id)}
                         className="col-span-2 bg-green-600 text-white py-3 rounded-lg font-bold hover:bg-green-700 transition-all flex items-center justify-center gap-2 animate-bounce-short shadow-md"
                     >
-                        <DollarSign size={18} /> Buy {currentTile.name} (${currentTile.price})
+                        <DollarSign size={18} /> Buy 1 share ({currentTile.name}) ($500)
                     </button>
                 )}
 
