@@ -3,7 +3,7 @@ import { useGameStore, canBuyAsset } from '@/store/gameStore';
 import { useShallow } from 'zustand/react/shallow';
 import { SkipForward, DollarSign } from 'lucide-react';
 import clsx from 'clsx';
-import type { Asset } from '@/data/boardData';
+import type { Asset, Tag } from '@/data/boardData';
 import { useState } from 'react';
 
 export function ControlPanel() {
@@ -82,6 +82,51 @@ export function ControlPanel() {
                     <h3 className="text-2xl tracking-widest leading-none" style={{ fontFamily: 'var(--font-lilita-one)' }}>
                         TURN {turnCount}
                     </h3>
+                </div>
+            </div>
+
+            {/* Portfolio Grid */}
+            <div className="px-4 shrink-0">
+                <div className="bg-slate-100 border-2 border-black p-3">
+                    <div className="grid grid-cols-2 gap-x-4 gap-y-2">
+                        {(['MEDIA', 'AI', 'ENERGY', 'CRYPTO', 'CHIPS', 'GOV'] as Tag[]).map((tag) => {
+                            const count = holdings
+                                .filter(h => h.tag === tag)
+                                .reduce((sum, h) => sum + h.shares, 0);
+
+                            // Map tags to specific colors based on the design
+                            const tagColors: Record<Tag, string> = {
+                                MEDIA: '#FF9F1C', // Orange
+                                AI: '#FF99C8',    // Pink
+                                ENERGY: '#FFD700',// Yellow
+                                CRYPTO: '#00FA9A',// Green
+                                CHIPS: '#C7A3E6', // Purple 
+                                GOV: '#00BFFF',   // Blue
+                            };
+
+                            const displayTag = tag === 'CRYPTO' ? 'CRYPT' : tag;
+
+                            return (
+                                <div key={tag} className="flex items-center justify-between">
+                                    <div
+                                        className="px-2 py-0.5 text-center min-w-[70px] border border-black/10"
+                                        style={{
+                                            backgroundColor: tagColors[tag],
+                                            fontFamily: 'var(--font-lilita-one)'
+                                        }}
+                                    >
+                                        <span className="text-[13px] text-black tracking-wide leading-none block pt-0.5">
+                                            {displayTag}
+                                        </span>
+                                    </div>
+                                    <div className="flex items-baseline gap-1" style={{ fontFamily: 'var(--font-lilita-one)' }}>
+                                        <span className="text-lg leading-none">×</span>
+                                        <span className="text-2xl leading-none">{count}</span>
+                                    </div>
+                                </div>
+                            );
+                        })}
+                    </div>
                 </div>
             </div>
 
