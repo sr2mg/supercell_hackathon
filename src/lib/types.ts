@@ -14,4 +14,5 @@ export interface NewsCard {
     reasonJa: string;
     reasonEn: string;
     direction: NewsDirection | null;
+    url?: string; // BBC article URL
 }

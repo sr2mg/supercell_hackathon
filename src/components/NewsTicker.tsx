@@ -1,7 +1,7 @@
 'use client';
 import { useGameStore } from '@/store/gameStore';
 import { useShallow } from 'zustand/react/shallow';
-import { TrendingUp, TrendingDown, Megaphone, Radio } from 'lucide-react';
+import { TrendingUp, TrendingDown, Radio, ChevronDown, ChevronUp, ExternalLink } from 'lucide-react';
 import { clsx } from 'clsx';
 import { useEffect, useState } from 'react';
 
@@ -14,6 +14,7 @@ export function NewsTicker() {
     })));
 
     const [visible, setVisible] = useState(false);
+    const [expanded, setExpanded] = useState(false);
 
     useEffect(() => {
         // Initial fetch if queue is empty
@@ -25,7 +26,8 @@ export function NewsTicker() {
     useEffect(() => {
         if (currentNews) {
             setVisible(true);
-            const timer = setTimeout(() => setVisible(false), 8000); // Longer format needs more time
+            setExpanded(false); // Close accordion on new news
+            const timer = setTimeout(() => setVisible(false), 8000);
             return () => clearTimeout(timer);
         }
     }, [currentNews]);
@@ -40,7 +42,8 @@ export function NewsTicker() {
         titleEn: 'Market Waiting...',
         reasonJa: 'ニュースを取得しています。',
         reasonEn: 'Fetching news...',
-        direction: null
+        direction: null,
+        url: undefined
     };
 
     const isMarket = activeNews.type === 'MARKET';
@@ -49,13 +52,15 @@ export function NewsTicker() {
 
     return (
         <div className="w-full bg-slate-900 text-white shadow-lg overflow-hidden flex flex-col border-b-4 border-slate-700">
-            {/* Top Bar: Active Effect */}
-            <div className={clsx(
-                "p-4 flex items-center justify-between transition-colors duration-500",
-                isMarket && isUp && 'bg-green-900/80 border-l-8 border-green-500',
-                isMarket && isDown && 'bg-red-900/80 border-l-8 border-red-500',
-                !isMarket && 'bg-slate-800 border-l-8 border-slate-600'
-            )}>
+            {/* Top Bar: Active Effect - Now clickable */}
+            <div
+                onClick={() => setExpanded(!expanded)}
+                className={clsx(
+                    "p-4 flex items-center justify-between transition-colors duration-500 cursor-pointer hover:brightness-110",
+                    isMarket && isUp && 'bg-green-900/80 border-l-8 border-green-500',
+                    isMarket && isDown && 'bg-red-900/80 border-l-8 border-red-500',
+                    !isMarket && 'bg-slate-800 border-l-8 border-slate-600'
+                )}>
                 <div className="flex items-center gap-4 w-full">
                     <div className={clsx(
                         "text-xs font-bold px-3 py-1 rounded-full animate-pulse shadow-md",
@@ -82,8 +87,40 @@ export function NewsTicker() {
                             </p>
                         </div>
                     </div>
+
+                    {/* Expand/Collapse Indicator */}
+                    <div className="flex items-center gap-2 text-slate-400">
+                        <span className="text-xs hidden md:block">Details</span>
+                        {expanded ? <ChevronUp className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
+                    </div>
                 </div>
             </div>
+
+            {/* Accordion Expanded Content */}
+            {expanded && (
+                <div className="bg-slate-800/50 border-t border-slate-700 p-4 animate-in slide-in-from-top-2 duration-200">
+                    <div className="flex flex-col gap-3">
+                        <div>
+                            <div className="text-xs text-slate-500 uppercase tracking-wide mb-1">日本語</div>
+                            <h3 className="text-lg font-bold text-slate-100">{activeNews.titleJa}</h3>
+                            <p className="text-sm text-slate-300 mt-1">{activeNews.reasonJa}</p>
+                        </div>
+
+                        {activeNews.url && (
+                            <a
+                                href={activeNews.url}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                onClick={(e) => e.stopPropagation()}
+                                className="inline-flex items-center gap-2 text-blue-400 hover:text-blue-300 text-sm font-medium transition-colors w-fit"
+                            >
+                                <ExternalLink className="w-4 h-4" />
+                                Read full article on BBC
+                            </a>
+                        )}
+                    </div>
+                </div>
+            )}
 
             {/* Marquee / Ticker History */}
             <div className="bg-slate-950 py-2 px-4 flex gap-8 overflow-hidden relative border-t border-slate-800">
@@ -112,3 +149,4 @@ export function NewsTicker() {
         </div>
     );
 }
+

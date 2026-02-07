@@ -76,7 +76,8 @@ export async function processNewsItems(rawNews: any[]): Promise<NewsCard[]> {
             titleEn: item.titleEn,
             reasonJa: item.reasonJa,
             reasonEn: item.reasonEn,
-            direction: asDirection(item.direction)
+            direction: asDirection(item.direction),
+            url: rawNews[index]?.link || undefined
         }));
 
     } catch (error) {
