@@ -39,7 +39,7 @@ interface GameState {
     triggerNews: () => void;
     fetchNews: () => Promise<void>;
     buyShare: (assetId: number) => void;
-    sellShare: (assetId: number) => void;
+    sellShare: (assetId: number, amount?: number) => void;
     resolveTileEffect: (tile: Asset, player: Player) => void;
 }
 
@@ -336,7 +336,7 @@ export const useGameStore = create<GameState>((set, get) => ({
         set({ players: updatedPlayers, board: updatedBoard });
     },
 
-    sellShare: (assetId) => {
+    sellShare: (assetId, amount = 1) => {
         const { players, activePlayerIndex, board, hasRolled } = get();
 
         // Only allow selling before rolling dice
@@ -347,22 +347,23 @@ export const useGameStore = create<GameState>((set, get) => ({
 
         if (!asset) return;
 
-        // Check if player owns at least 1 share
+        // Check if player owns enough shares
         const holding = asset.shareholders.find(h => h.playerId === player.id);
-        if (!holding || holding.shares <= 0) return;
+        if (!holding || holding.shares < amount) return;
 
         // Sell at current Market Price
+        const totalValue = asset.price * amount;
         const updatedPlayers = [...players];
-        updatedPlayers[activePlayerIndex] = { ...player, money: player.money + asset.price };
+        updatedPlayers[activePlayerIndex] = { ...player, money: player.money + totalValue };
 
         const updatedBoard = board.map(t => {
             if (t.id !== assetId) return t;
             const newShareholders = t.shareholders
-                .map(h => h.playerId === player.id ? { ...h, shares: h.shares - 1 } : h)
+                .map(h => h.playerId === player.id ? { ...h, shares: h.shares - amount } : h)
                 .filter(h => h.shares > 0);
             return {
                 ...t,
-                sharesRemaining: Math.min(t.sharesTotal, t.sharesRemaining + 1),
+                sharesRemaining: Math.min(t.sharesTotal, t.sharesRemaining + amount),
                 shareholders: newShareholders
             };
         });
