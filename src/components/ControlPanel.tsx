@@ -40,19 +40,112 @@ export function ControlPanel() {
     const holdings = getHoldings(board, activePlayer.id);
 
 
+    const [isSellMode, setIsSellMode] = useState(false);
     const [sellAmounts, setSellAmounts] = useState<Record<number, number>>({});
 
-    const getSellAmount = (assetId: number) => sellAmounts[assetId] || 1;
+    // Initialize sell amounts when entering sell mode
+    const handleEnterSellMode = () => {
+        const initialAmounts: Record<number, number> = {};
+        holdings.forEach(h => {
+            initialAmounts[h.id] = 0;
+        });
+        setSellAmounts(initialAmounts);
+        setIsSellMode(true);
+    };
+
+    const getSellAmount = (assetId: number) => sellAmounts[assetId] || 0;
 
     const adjustSellAmount = (assetId: number, delta: number, max: number) => {
         const current = getSellAmount(assetId);
-        const next = Math.min(max, Math.max(1, current + delta));
+        const next = Math.min(max, Math.max(0, current + delta));
         setSellAmounts(prev => ({ ...prev, [assetId]: next }));
     };
 
+    const handleConfirmSell = () => {
+        Object.entries(sellAmounts).forEach(([assetId, amount]) => {
+            if (amount > 0) {
+                sellShare(Number(assetId), amount);
+            }
+        });
+        setIsSellMode(false);
+    };
+
+    const handleExitSellMode = () => {
+        setIsSellMode(false);
+    };
+
+    if (isSellMode) {
+        return (
+            <div className="flex flex-col gap-4 bg-white p-6 rounded-xl shadow-lg border border-slate-200 w-full max-w-sm h-full relative">
+                {/* Sell Mode Header */}
+                <div className="text-center mb-2">
+                    <h3 className="text-lg font-bold font-sans">Select shares to sell.</h3>
+                </div>
+
+                {/* Holdings List for Selling */}
+                <div className="flex-1 overflow-y-auto space-y-3">
+                    {holdings.length === 0 ? (
+                        <div className="text-center text-slate-500 py-4">No shares to sell</div>
+                    ) : (
+                        holdings.map(h => {
+                            const sellAmount = getSellAmount(h.id);
+                            return (
+                                <div key={h.id} className="flex items-center justify-between text-lg font-bold font-sans tracking-tight">
+                                    <div className="flex items-center gap-2">
+                                        <div
+                                            className="w-4 h-4 rounded-full border border-black"
+                                            style={{ backgroundColor: h.tag === 'AI' ? '#FDA3F5' : h.tag === 'CHIPS' ? '#00E16D' : h.tag === 'ENERGY' ? '#F5D304' : '#07A5E2' }} // Simplified color mapping based on tag for now, ideally strictly from data
+                                        />
+                                        <span className="truncate max-w-[140px] uppercase text-black">{h.name}</span>
+                                    </div>
+                                    <div className="flex items-center gap-2 text-black">
+                                        <span className="mr-1">—</span>
+                                        <button
+                                            onClick={() => adjustSellAmount(h.id, -1, h.shares)}
+                                            disabled={sellAmount <= 0}
+                                            className="text-2xl leading-none text-slate-500 hover:text-black disabled:opacity-30 px-1"
+                                        >
+                                            -
+                                        </button>
+                                        <span className="font-mono">{sellAmount}/{h.shares}</span>
+                                        <button
+                                            onClick={() => adjustSellAmount(h.id, 1, h.shares)}
+                                            disabled={sellAmount >= h.shares}
+                                            className="text-2xl leading-none text-slate-500 hover:text-black disabled:opacity-30 px-1"
+                                        >
+                                            +
+                                        </button>
+                                    </div>
+                                </div>
+                            );
+                        })
+                    )}
+                </div>
+
+                {/* Actions */}
+                <div className="flex flex-col gap-3 mt-auto">
+                    <button
+                        onClick={handleConfirmSell}
+                        className="w-full bg-black text-white text-3xl py-2 rounded-full font-black tracking-wider hover:scale-105 active:scale-95 transition-transform"
+                        style={{ fontFamily: 'var(--font-lilita-one)' }}
+                    >
+                        SELL
+                    </button>
+                    <button
+                        onClick={handleExitSellMode}
+                        className="w-full bg-white text-black text-3xl py-2 rounded-full font-black tracking-wider border-[3px] border-black hover:bg-slate-50 active:scale-95 transition-transform"
+                        style={{ fontFamily: 'var(--font-lilita-one)' }}
+                    >
+                        EXIT
+                    </button>
+                </div>
+
+            </div>
+        );
+    }
+
     return (
         <div className="flex flex-col gap-4 bg-white p-6 rounded-xl shadow-lg border border-slate-200 w-full max-w-sm">
-            {/* Header */}
             {/* Header */}
             <div className="flex justify-center border-b pb-4">
                 <div className="bg-black text-white px-6 py-2 rounded-full shadow-lg transform -rotate-1">
@@ -82,6 +175,17 @@ export function ControlPanel() {
                     </button>
                 )}
 
+                {/* Main Sell Button to enter mode */}
+                {!activePlayer.isComputer && hasRolled === false && holdings.length > 0 && (
+                    <button
+                        onClick={handleEnterSellMode}
+                        className="col-span-2 bg-red-500 text-white text-2xl py-2 rounded-full font-black tracking-wider hover:bg-red-600 transition-all shadow-md"
+                        style={{ fontFamily: 'var(--font-lilita-one)' }}
+                    >
+                        SELL
+                    </button>
+                )}
+
                 <button
                     onClick={nextTurn}
                     disabled={activePlayer.isComputer}
@@ -101,9 +205,6 @@ export function ControlPanel() {
                     <div className="mt-2 space-y-1">
                         {holdings.map(h => {
                             const pnl = h.dividend - h.purchaseDividend;
-                            const canSell = !hasRolled && !activePlayer.isComputer;
-                            const sellAmount = getSellAmount(h.id);
-
                             return (
                                 <div key={h.id} className="flex items-center justify-between text-[11px] text-slate-700">
                                     <div className="truncate max-w-[100px]">{h.name}</div>
@@ -113,29 +214,6 @@ export function ControlPanel() {
                                             ({pnl >= 0 ? '+' : ''}{pnl})
                                         </span>
                                         <span>· {h.shares}sh</span>
-                                        {canSell && (
-                                            <div className="flex items-center gap-1 bg-slate-100 rounded px-1">
-                                                <button
-                                                    onClick={() => adjustSellAmount(h.id, -1, h.shares)}
-                                                    className="w-4 h-4 flex items-center justify-center text-slate-500 hover:text-slate-700 hover:bg-slate-200 rounded"
-                                                >
-                                                    -
-                                                </button>
-                                                <span className="w-3 text-center font-bold">{sellAmount}</span>
-                                                <button
-                                                    onClick={() => adjustSellAmount(h.id, 1, h.shares)}
-                                                    className="w-4 h-4 flex items-center justify-center text-slate-500 hover:text-slate-700 hover:bg-slate-200 rounded"
-                                                >
-                                                    +
-                                                </button>
-                                                <button
-                                                    onClick={() => sellShare(h.id, sellAmount)}
-                                                    className="ml-1 px-1.5 py-0.5 bg-red-100 text-red-600 rounded text-[10px] font-medium hover:bg-red-200 transition-colors"
-                                                >
-                                                    Sell (${h.price * sellAmount})
-                                                </button>
-                                            </div>
-                                        )}
                                     </div>
                                 </div>
                             );
@@ -224,8 +302,6 @@ export function ControlPanel() {
         </div>
     );
 }
-
-
 
 function getHoldings(board: Asset[], playerId: number) {
     return board
