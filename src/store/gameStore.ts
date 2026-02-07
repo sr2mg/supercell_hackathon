@@ -189,15 +189,25 @@ export const useGameStore = create<GameState>((set, get) => ({
             // MARKET news: use the LLM-assigned tag
             effectTag = nextNews.tag;
         } else if (nextNews.type === 'NOISE') {
-            // NOISE news: random tag with weighted probabilities
-            // CRYPTO: 40%, MEDIA: 30%, AI: 10%, CHIPS: 10%, ENERGY: 5%, GOV: 5%
-            const rand = Math.random();
-            if (rand < 0.40) effectTag = 'CRYPTO';
-            else if (rand < 0.70) effectTag = 'MEDIA';
-            else if (rand < 0.80) effectTag = 'AI';
-            else if (rand < 0.90) effectTag = 'CHIPS';
-            else if (rand < 0.95) effectTag = 'ENERGY';
-            else effectTag = 'GOV';
+            // NOISE news: 三択（暴騰、暴落、何も起きない）
+            // 1/3: 暴騰、1/3: 暴落、1/3: 何も起きない
+            const noiseRand = Math.random();
+            if (noiseRand < 0.33) {
+                // 何も起きない
+                effectTag = null;
+            } else {
+                // 暴騰 or 暴落 - ランダムなタグを選択
+                const tagRand = Math.random();
+                if (tagRand < 0.40) effectTag = 'CRYPTO';
+                else if (tagRand < 0.70) effectTag = 'MEDIA';
+                else if (tagRand < 0.80) effectTag = 'AI';
+                else if (tagRand < 0.90) effectTag = 'CHIPS';
+                else if (tagRand < 0.95) effectTag = 'ENERGY';
+                else effectTag = 'GOV';
+
+                // 暴騰か暴落かを決定（残りの2/3を半分ずつ）
+                nextNews.direction = noiseRand < 0.66 ? 'UP' : 'DOWN';
+            }
         }
 
         if (effectTag) {
@@ -206,13 +216,16 @@ export const useGameStore = create<GameState>((set, get) => ({
                 nextNews.direction === 'DOWN' ? false :
                     Math.random() < 0.5;
 
+            // NOISEの場合は暴騰/暴落なので大きな変動（+/-300）
+            const noiseAmount = nextNews.type === 'NOISE' ? 300 : amount;
+
             if (!isUp) {
                 lastDownTag = effectTag;
             }
 
             newBoard = newBoard.map(asset => {
                 if (asset.tag === effectTag && !asset.isBankrupt && !asset.isPayday) {
-                    const change = isUp ? amount : -amount;
+                    const change = isUp ? noiseAmount : -noiseAmount;
                     const newDividend = Math.max(0, asset.dividend + change);
                     return { ...asset, dividend: newDividend };
                 }
