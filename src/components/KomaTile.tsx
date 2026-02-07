@@ -1,6 +1,7 @@
 import { clsx } from 'clsx';
 import type { Tag } from '@/data/boardData';
 import type { Player } from '@/types/game';
+import { PlayerToken } from './PlayerToken';
 
 interface KomaTileProps {
     name: string;
@@ -111,15 +112,20 @@ export function KomaTile({
                     const cy = 142.5;
                     const left = (cx / 300) * 100;
                     const top = (cy / 300) * 100;
+                    const color = playerColors[h.playerId] || '#9ca3af'; // default gray-400 equivalent
 
                     return (
                         <div
                             key={`sh-${i}`}
                             className={clsx(
                                 "absolute w-[8%] h-[8%] rounded-full border-2 border-black transform -translate-x-1/2 -translate-y-1/2 flex items-center justify-center",
-                                playerColors[h.playerId] || 'bg-gray-400'
+                                !color.startsWith('#') && color
                             )}
-                            style={{ left: `${left}%`, top: `${top}%` }}
+                            style={{
+                                left: `${left}%`,
+                                top: `${top}%`,
+                                backgroundColor: color.startsWith('#') ? color : undefined
+                            }}
                             title={`Shareholder: Player ${h.playerId} (${h.shares})`}
                         >
                             {/* Optional: Show share count if tiny text fits, or just color indicator */}
@@ -137,12 +143,14 @@ export function KomaTile({
                 {playersOnTile.map(p => (
                     <div
                         key={p.id}
-                        className={clsx(
-                            "w-6 h-6 rounded-full border-2 border-black shadow-lg", // Larger player tokens
-                            p.color
-                        )}
+                        className="relative z-20 transition-transform hover:scale-110"
                         title={p.name}
-                    />
+                    >
+                        <PlayerToken
+                            color={p.color}
+                            className="w-10 h-10 drop-shadow-md"
+                        />
+                    </div>
                 ))}
             </div>
         </div>
