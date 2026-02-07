@@ -3,10 +3,32 @@ import type { Asset, Tag } from '@/data/boardData';
 import { SHARE_PRICE, SHARE_VALUE } from './stockConstants';
 
 export function canBuyAsset(asset: Asset | undefined, player: Player): boolean {
-    if (!asset) return false;
-    if (asset.isPayday) return false;
-    if (asset.isBankrupt) return false;
-    return asset.sharesRemaining > 0 && player.money >= asset.price;
+    if (!asset) {
+        console.log(`[canBuyAsset] Fail: No asset.`);
+        return false;
+    }
+    if (asset.isPayday) {
+        // console.log(`[canBuyAsset] Fail: Payday tile.`);
+        return false;
+    }
+    if (asset.isBankrupt) {
+        console.log(`[canBuyAsset] Fail: Asset is bankrupt.`);
+        return false;
+    }
+
+    // Check remaining shares
+    if (asset.sharesRemaining <= 0) {
+        console.log(`[canBuyAsset] Fail: No shares remaining for ${asset.name}. (Total: ${asset.sharesTotal}, Remaining: ${asset.sharesRemaining})`);
+        return false;
+    }
+
+    // Check money
+    if (player.money < asset.price) {
+        console.log(`[canBuyAsset] Fail: Insufficient funds. (Player: ${player.money}, Price: ${asset.price})`);
+        return false;
+    }
+
+    return true;
 }
 
 export function getPlayerAssets(player: Player, board: Asset[]): number {
