@@ -134,7 +134,22 @@ export const useGameStore = create<GameState>((set, get) => ({
             position: newPos,
             money: player.money + (passedGo ? 200 : 0),
         };
-        set({ players: updatedPlayers });
+
+        if (passedGo) {
+            const paydayNews: NewsCard = {
+                id: `payday-${Date.now()}-${activePlayerIndex}`,
+                sourceTitle: 'System',
+                type: 'MARKET',
+                tag: 'GOV',
+                title: 'Payday! Salary Paid',
+                reason: 'Passed Start Tile (+200)',
+                direction: 'UP'
+            };
+            const { newsLog } = get();
+            set({ players: updatedPlayers, newsLog: [paydayNews, ...newsLog] });
+        } else {
+            set({ players: updatedPlayers });
+        }
         get().resolveTileEffect(board[newPos], updatedPlayers[activePlayerIndex]);
     },
 
