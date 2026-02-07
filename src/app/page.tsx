@@ -5,24 +5,45 @@ import { ControlPanel } from "@/components/ControlPanel";
 import { NewsTicker } from "@/components/NewsTicker";
 import { HowToPlay } from "@/components/HowToPlay";
 import { useGameStore } from "@/store/gameStore";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 export default function Home() {
   const isNewsReady = useGameStore(state => state.isNewsReady);
   const fetchNews = useGameStore(state => state.fetchNews);
+  const [hasStarted, setHasStarted] = useState(false);
 
   // Prefetch news on mount
   useEffect(() => {
     fetchNews({ mode: 'initial', initialCount: 1, chunkSize: 5 });
   }, [fetchNews]);
 
-  if (!isNewsReady) {
+  if (!hasStarted) {
     return (
-      <main className="min-h-screen bg-slate-900 flex flex-col items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-16 w-16 border-4 border-slate-600 border-t-yellow-400 mx-auto mb-6"></div>
-          <h1 className="text-2xl font-bold text-white mb-2">NEWSOPOLY</h1>
-          <p className="text-slate-400 animate-pulse">Fetching latest market news...</p>
+      <main className="min-h-screen bg-[#efede6] flex flex-col items-center justify-center">
+        <div className="flex flex-col items-center justify-center gap-10">
+          <img
+            src="/logo-s.png"
+            alt="Newsopoly"
+            className="w-[420px] max-w-[80vw] h-auto"
+          />
+          <div className="flex flex-col items-center gap-3">
+            <button
+              onClick={() => {
+                if (isNewsReady) setHasStarted(true);
+              }}
+              className="px-10 py-3 rounded-full text-2xl tracking-wide transition-all disabled:opacity-40 disabled:cursor-not-allowed bg-black text-white"
+              style={{ fontFamily: 'var(--font-lilita-one)' }}
+              disabled={!isNewsReady}
+            >
+              MARKET OPEN
+            </button>
+            <div className="text-black text-xl tracking-widest">
+              PRESS TO START
+            </div>
+          </div>
+          <div className="text-black/60 text-sm tracking-wide">
+            {isNewsReady ? 'Ready.' : 'Loading market news...'}
+          </div>
         </div>
       </main>
     );
