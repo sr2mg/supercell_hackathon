@@ -1,9 +1,10 @@
 'use client';
 import { useGameStore } from '@/store/gameStore';
 import { useShallow } from 'zustand/react/shallow';
-import { TrendingUp, TrendingDown, Radio, ChevronDown, ChevronUp, ExternalLink } from 'lucide-react';
+import { ChevronDown, ChevronUp, ExternalLink } from 'lucide-react';
 import { clsx } from 'clsx';
 import { useEffect, useState } from 'react';
+import { NewsBlock } from './NewsBlock';
 
 export function NewsTicker() {
     const { currentNews, newsLog, fetchNews, newsQueue } = useGameStore(useShallow(state => ({
@@ -144,4 +145,3 @@ export function NewsTicker() {
         </div>
     );
 }
-
