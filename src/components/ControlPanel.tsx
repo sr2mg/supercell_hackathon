@@ -117,7 +117,7 @@ export function ControlPanel() {
                                 <div key={h.id} className="flex items-center justify-between text-[11px] text-slate-700">
                                     <div className="truncate max-w-[150px]">{h.name}</div>
                                     <div className="font-mono">
-                                        {h.shares} sh · D {h.dividend} · ${h.shares * SHARE_VALUE}
+                                        Rent ${h.dividend} · {h.shares} shares · Worth ${h.shares * SHARE_VALUE}
                                     </div>
                                 </div>
                             ))}
