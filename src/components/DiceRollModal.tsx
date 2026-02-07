@@ -44,7 +44,7 @@ export function DiceRollModal() {
     return (
         <>
             <div className="absolute inset-0 z-40 flex items-center justify-center bg-black/40 backdrop-blur-sm rounded-xl animate-fade-in pointer-events-none" />
-            <div className="absolute inset-0 z-50 flex items-center justify-center pointer-events-none">
+            <div className="absolute inset-0 z-[100] flex items-center justify-center pointer-events-none">
                 <div className="bg-white p-8 rounded-2xl shadow-2xl transform scale-100 animate-pop-in flex gap-8 items-center border-[6px] border-slate-900 pointer-events-auto">
                     <DiceDisplay value={displayedDice[0]} />
                     <DiceDisplay value={displayedDice[1]} />
