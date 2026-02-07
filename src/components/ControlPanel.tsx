@@ -75,7 +75,7 @@ export function ControlPanel() {
     };
 
     return (
-        <div className="flex flex-col gap-4 bg-white p-6 rounded-xl shadow-lg border border-slate-200 w-full max-w-sm min-h-[500px]">
+        <div className="flex flex-col gap-4 bg-white p-6 rounded-xl shadow-lg border border-slate-200 w-full max-w-sm min-h-[650px]">
             {/* Header */}
             <div className="flex justify-center border-b pb-4 shrink-0">
                 <div className="bg-black text-white px-6 py-2 rounded-full shadow-lg transform -rotate-1">
@@ -271,7 +271,7 @@ export function ControlPanel() {
                         </div>
 
                         {/* Player List */}
-                        <div className="mt-4 space-y-2 overflow-y-auto max-h-[200px] pr-1">
+                        <div className="mt-4 space-y-2 pr-1">
                             {players.map(p => {
                                 const playerHoldings = getHoldings(board, p.id);
                                 const playerStockValue = playerHoldings.reduce((acc, h) => acc + (h.shares * h.price), 0);
