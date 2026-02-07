@@ -243,33 +243,6 @@ export function ControlPanel() {
                             )}
                         </div>
 
-                        {/* Active Player Summary */}
-                        <div className="rounded-lg border border-slate-200 bg-slate-50 p-3 shrink-0">
-                            <div className="text-xs font-semibold text-slate-700">Holdings</div>
-                            {holdings.length === 0 && (
-                                <div className="text-[11px] text-slate-500 mt-1">No shares yet</div>
-                            )}
-                            {holdings.length > 0 && (
-                                <div className="mt-2 space-y-1">
-                                    {holdings.map(h => {
-                                        const pnl = h.dividend - h.purchaseDividend;
-                                        return (
-                                            <div key={h.id} className="flex items-center justify-between text-[11px] text-slate-700">
-                                                <div className="truncate max-w-[100px]">{h.name}</div>
-                                                <div className="font-mono flex items-center gap-2">
-                                                    <span>D${h.dividend}</span>
-                                                    <span className={pnl >= 0 ? 'text-green-600' : 'text-red-600'}>
-                                                        ({pnl >= 0 ? '+' : ''}{pnl})
-                                                    </span>
-                                                    <span>· {h.shares}sh</span>
-                                                </div>
-                                            </div>
-                                        );
-                                    })}
-                                </div>
-                            )}
-                        </div>
-
                         {/* Player List */}
                         <div className="mt-4 space-y-2 pr-1">
                             {players.map(p => {
