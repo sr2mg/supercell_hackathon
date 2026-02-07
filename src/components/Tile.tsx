@@ -1,5 +1,5 @@
 import { Asset as TileType, Tag } from '@/data/boardData';
-import { Building2, Siren, ArrowRight, Plane, Bot, Bitcoin, Instagram, TrendingUp, Landmark, Wifi, Bike, Gavel, Server, Film } from 'lucide-react';
+import { Building2, Siren, ArrowRight, Plane, Bot, Bitcoin, Instagram, TrendingUp, Landmark, Wifi, Bike, Gavel, Server, Film, Coffee, Lock } from 'lucide-react';
 import { clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 
@@ -45,7 +45,20 @@ export function Tile({ tile, playersOnTile, orientation = 'bottom' }: TileProps)
             <div className={clsx("flex flex-col items-center justify-center w-full h-full z-10 px-0.5", !tile.isPayday ? "pt-3 md:pt-4" : "")}>
                 {getLocationIcon(tile)}
                 <span className="text-center font-bold mt-0.5 md:mt-1 leading-none text-[8px] md:text-[10px] lg:text-xs text-slate-800 break-words w-full overflow-hidden text-ellipsis line-clamp-2 md:line-clamp-none">{tile.name}</span>
-                {!tile.isPayday && <span className="text-slate-500 font-mono text-[8px] md:text-[10px]">D {tile.dividend}</span>}
+                {!tile.isPayday && (
+                    <div className="flex items-center gap-0.5">
+                        <span className="text-slate-500 font-mono text-[8px] md:text-[10px]">D {tile.dividend}</span>
+                        {tile.dividend !== tile.previousDividend && (
+                            <span className={clsx(
+                                "font-bold text-[7px] md:text-[9px]",
+                                tile.dividend > tile.previousDividend ? "text-green-600" : "text-red-600"
+                            )}>
+                                {tile.dividend > tile.previousDividend ? '↑' : '↓'}
+                                {Math.abs(tile.dividend - tile.previousDividend)}
+                            </span>
+                        )}
+                    </div>
+                )}
             </div>
 
             {/* Players */}

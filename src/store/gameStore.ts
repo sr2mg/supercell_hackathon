@@ -227,10 +227,15 @@ export const useGameStore = create<GameState>((set, get) => ({
                 if (asset.tag === effectTag && !asset.isBankrupt && !asset.isPayday) {
                     const change = isUp ? noiseAmount : -noiseAmount;
                     const newDividend = Math.max(0, asset.dividend + change);
-                    return { ...asset, dividend: newDividend };
+                    // 変動前のdividendをpreviousDividendに保存
+                    return { ...asset, previousDividend: asset.dividend, dividend: newDividend };
                 }
-                return asset;
+                // effectTagに関係ないアセットもpreviousDividendをリセット（変動なし）
+                return { ...asset, previousDividend: asset.dividend };
             });
+        } else {
+            // 効果なしの場合もpreviousDividendをリセット
+            newBoard = newBoard.map(asset => ({ ...asset, previousDividend: asset.dividend }));
         }
 
         // Apply Bankruptcy & IPO Rules
@@ -284,8 +289,16 @@ export const useGameStore = create<GameState>((set, get) => ({
             if (t.id !== assetId) return t;
             const existing = t.shareholders.find(h => h.playerId === player.id);
             const newShareholders = existing
-                ? t.shareholders.map(h => h.playerId === player.id ? { ...h, shares: h.shares + 1 } : h)
-                : [...t.shareholders, { playerId: player.id, shares: 1 }];
+                ? t.shareholders.map(h => {
+                    if (h.playerId !== player.id) return h;
+                    // 追加購入：平均購入配当を計算
+                    const totalShares = h.shares + 1;
+                    const avgPurchaseDividend = Math.round(
+                        (h.purchaseDividend * h.shares + t.dividend) / totalShares
+                    );
+                    return { ...h, shares: totalShares, purchaseDividend: avgPurchaseDividend };
+                })
+                : [...t.shareholders, { playerId: player.id, shares: 1, purchaseDividend: t.dividend }];
             return {
                 ...t,
                 sharesRemaining: Math.max(0, t.sharesRemaining - 1),

@@ -114,14 +114,21 @@ export function ControlPanel() {
                     )}
                     {holdings.length > 0 && (
                         <div className="mt-2 space-y-1">
-                            {holdings.map(h => (
-                                <div key={h.id} className="flex items-center justify-between text-[11px] text-slate-700">
-                                    <div className="truncate max-w-[150px]">{h.name}</div>
-                                    <div className="font-mono">
-                                        Rent ${h.dividend} · {h.shares} shares · Worth ${h.shares * SHARE_VALUE}
+                            {holdings.map(h => {
+                                const pnl = h.dividend - h.purchaseDividend;
+                                return (
+                                    <div key={h.id} className="flex items-center justify-between text-[11px] text-slate-700">
+                                        <div className="truncate max-w-[150px]">{h.name}</div>
+                                        <div className="font-mono flex items-center gap-1">
+                                            <span>D${h.dividend}</span>
+                                            <span className={pnl >= 0 ? 'text-green-600' : 'text-red-600'}>
+                                                ({pnl >= 0 ? '+' : ''}{pnl})
+                                            </span>
+                                            <span>· {h.shares}sh · ${h.shares * SHARE_VALUE}</span>
+                                        </div>
                                     </div>
-                                </div>
-                            ))}
+                                );
+                            })}
                         </div>
                     )}
                 </div>
@@ -157,14 +164,21 @@ export function ControlPanel() {
                                         <div className="text-slate-400">No shares yet</div>
                                     ) : (
                                         <div className="space-y-1.5">
-                                            {playerHoldings.map(h => (
-                                                <div key={h.id} className="flex items-center justify-between gap-4">
-                                                    <span className="truncate max-w-[120px] text-slate-100">{h.name}</span>
-                                                    <span className="font-mono text-slate-300 whitespace-nowrap">
-                                                        {h.shares} sh · ${h.dividend} rent · ${h.shares * SHARE_VALUE}
-                                                    </span>
-                                                </div>
-                                            ))}
+                                            {playerHoldings.map(h => {
+                                                const pnl = h.dividend - h.purchaseDividend;
+                                                return (
+                                                    <div key={h.id} className="flex items-center justify-between gap-4">
+                                                        <span className="truncate max-w-[120px] text-slate-100">{h.name}</span>
+                                                        <span className="font-mono text-slate-300 whitespace-nowrap">
+                                                            {h.shares}sh · D${h.dividend}{' '}
+                                                            <span className={pnl >= 0 ? 'text-green-400' : 'text-red-400'}>
+                                                                ({pnl >= 0 ? '+' : ''}{pnl})
+                                                            </span>
+                                                            {' '}· ${h.shares * SHARE_VALUE}
+                                                        </span>
+                                                    </div>
+                                                );
+                                            })}
                                             <div className="border-t border-slate-600 pt-1.5 mt-1.5 flex justify-between font-semibold">
                                                 <span>Total Stock Value</span>
                                                 <span className="font-mono">${playerStockValue}</span>
@@ -189,13 +203,15 @@ function DiceIcon({ value, isRolling }: { value: number, isRolling: boolean }) {
 function getHoldings(board: Asset[], playerId: number) {
     return board
         .map(asset => {
-            const owned = asset.shareholders.find(h => h.playerId === playerId)?.shares || 0;
+            const holder = asset.shareholders.find(h => h.playerId === playerId);
+            if (!holder) return null;
             return {
                 id: asset.id,
                 name: asset.name,
-                shares: owned,
-                dividend: asset.dividend
+                shares: holder.shares,
+                dividend: asset.dividend,
+                purchaseDividend: holder.purchaseDividend
             };
         })
-        .filter(h => h.shares > 0);
+        .filter((h): h is NonNullable<typeof h> => h !== null && h.shares > 0);
 }
