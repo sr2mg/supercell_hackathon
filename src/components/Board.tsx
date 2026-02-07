@@ -38,7 +38,7 @@ export function Board() {
                         gridRowEnd: sideLength
                     }}
                 >
-                    <h1 className="text-2xl sm:text-4xl md:text-6xl font-black text-slate-800 tracking-tighter mb-2 md:mb-4">NEWSOPOLY</h1>
+                    <h1 className="text-4xl sm:text-6xl md:text-8xl font-bebas font-black text-slate-800 tracking-tighter mb-2 md:mb-4">NEWSOPOLY</h1>
                     <div className="text-[10px] sm:text-sm text-slate-500 font-medium uppercase tracking-widest">Global Edition</div>
                 </div>
 
@@ -58,6 +58,6 @@ export function Board() {
                     );
                 })}
             </div>
-        </div>
+        </div >
     );
 }

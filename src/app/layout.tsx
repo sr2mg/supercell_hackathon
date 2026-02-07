@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Rammetto_One, Inter } from "next/font/google";
+import { Rammetto_One, Inter, Bebas_Neue } from "next/font/google";
 import "./globals.css";
 
 const rammettoOne = Rammetto_One({
@@ -10,6 +10,12 @@ const rammettoOne = Rammetto_One({
 
 const inter = Inter({
   variable: "--font-inter",
+  subsets: ["latin"],
+});
+
+const bebasNeue = Bebas_Neue({
+  weight: "400",
+  variable: "--font-bebas-neue",
   subsets: ["latin"],
 });
 
@@ -26,7 +32,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${rammettoOne.variable} ${inter.variable} antialiased`}
+        className={`${rammettoOne.variable} ${inter.variable} ${bebasNeue.variable} antialiased`}
         suppressHydrationWarning
       >
         {children}

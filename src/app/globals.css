@@ -12,6 +12,7 @@
 
   --font-display: var(--font-rammetto-one), ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
   --font-body: var(--font-inter), ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+  --font-bebas: var(--font-bebas-neue), ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
 }
 
 /*
@@ -32,6 +33,10 @@
 
 @utility font-body {
   font-family: var(--font-body);
+}
+
+@utility font-bebas {
+  font-family: var(--font-bebas);
 }
 
 :root {

@@ -45,7 +45,7 @@ export function Tile({ tile, playersOnTile, orientation = 'bottom' }: TileProps)
             {/* Content */}
             <div className={clsx("flex flex-col items-center justify-center w-full h-full z-10 px-0.5", !tile.isPayday ? "pt-3 md:pt-4" : "")}>
                 {getLocationIcon(tile)}
-                <span className="text-center font-bold mt-0.5 md:mt-1 leading-none text-[8px] md:text-[10px] lg:text-xs text-slate-800 break-words w-full overflow-hidden text-ellipsis line-clamp-2 md:line-clamp-none">{tile.name}</span>
+                <span className="text-center font-bebas tracking-wide mt-0.5 md:mt-1 leading-none text-[10px] md:text-xs lg:text-sm text-slate-800 break-words w-full overflow-hidden text-ellipsis line-clamp-2 md:line-clamp-none uppercase">{tile.name}</span>
                 {!tile.isPayday && (
                     <div className="flex items-center gap-0.5">
                         <span className="text-slate-500 font-mono text-[8px] md:text-[10px]">D {tile.dividend}</span>
