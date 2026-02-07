@@ -232,13 +232,15 @@ export function ControlPanel() {
                                 </button>
                             )}
 
-                            <button
-                                onClick={nextTurn}
-                                disabled={activePlayer.isComputer}
-                                className="col-span-2 border border-slate-300 text-slate-600 py-2 rounded-lg font-medium hover:bg-slate-50 disabled:opacity-50 flex items-center justify-center gap-2"
-                            >
-                                <SkipForward size={16} /> End Turn
-                            </button>
+                            {hasRolled && (
+                                <button
+                                    onClick={nextTurn}
+                                    disabled={activePlayer.isComputer}
+                                    className="col-span-2 border border-slate-300 text-slate-600 py-2 rounded-lg font-medium hover:bg-slate-50 disabled:opacity-50 flex items-center justify-center gap-2"
+                                >
+                                    <SkipForward size={16} /> End Turn
+                                </button>
+                            )}
                         </div>
 
                         {/* Active Player Summary */}
