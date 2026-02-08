@@ -257,7 +257,10 @@ export function ControlPanel() {
 
                                 {canBuy && !activePlayer.isComputer && (
                                     <button
-                                        onClick={() => buyShare(currentTile.id)}
+                                        onClick={() => {
+                                            playSound('share-pay', 0.5);
+                                            buyShare(currentTile.id);
+                                        }}
                                         className="col-span-2 bg-green-600 text-white py-3 rounded-lg font-bold hover:bg-green-700 transition-all flex items-center justify-center gap-2 animate-bounce-short shadow-md"
                                     >
                                         <DollarSign size={18} /> Buy 1 share ({currentTile.name}) ({currentTile.price})
