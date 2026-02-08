@@ -69,6 +69,15 @@ export function ResultModal({ winner, winningReason, players, board }: ResultMod
                         })}
                     </div>
                 </div>
+
+                {/* Play Again Button */}
+                <button
+                    onClick={() => window.location.reload()}
+                    className="mt-6 w-full bg-black text-white text-4xl tracking-widest leading-none py-3 border-4 border-black rounded-full transition-all flex items-center justify-center gap-2 hover:scale-105 active:scale-95 shadow-md"
+                    style={{ fontFamily: 'var(--font-lilita-one)' }}
+                >
+                    PLAY AGAIN
+                </button>
             </div>
         </div>
     );
