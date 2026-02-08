@@ -1,7 +1,7 @@
 'use client';
 import { useGameStore, canBuyAsset } from '@/store/gameStore';
 import { useShallow } from 'zustand/react/shallow';
-import { SkipForward, DollarSign } from 'lucide-react';
+import { DollarSign } from 'lucide-react';
 import clsx from 'clsx';
 import type { Asset, Tag } from '@/data/boardData';
 import { useEffect, useRef, useState } from 'react';
@@ -279,9 +279,10 @@ export function ControlPanel() {
                                     <button
                                         onClick={nextTurn}
                                         disabled={activePlayer.isComputer}
-                                        className="col-span-2 border border-slate-300 text-slate-600 py-2 rounded-lg font-medium hover:bg-slate-50 disabled:opacity-50 flex items-center justify-center gap-2"
+                                        className="col-span-2 text-black text-4xl tracking-widest leading-none py-2 border-4 border-black rounded-full disabled:opacity-30 transition-all flex items-center justify-center hover:scale-105 active:scale-95"
+                                        style={{ fontFamily: 'var(--font-lilita-one)' }}
                                     >
-                                        <SkipForward size={16} /> End Turn
+                                        END TURN
                                     </button>
                                 )}
                             </div>
