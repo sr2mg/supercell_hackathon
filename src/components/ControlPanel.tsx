@@ -337,13 +337,13 @@ export function ControlPanel() {
 
                                             {/* Net Worth */}
                                             <div className="flex items-baseline gap-1 text-black">
-                                                <span className="text-xl" style={{ fontFamily: 'var(--font-lilita-one)' }}>$</span>
-                                                <span className="text-5xl leading-none" style={{ fontFamily: 'var(--font-lilita-one)' }}>{playerNetWorth}</span>
+                                                <span className="text-lg" style={{ fontFamily: 'var(--font-lilita-one)' }}>$</span>
+                                                <span className="text-4xl leading-none" style={{ fontFamily: 'var(--font-lilita-one)' }}>{playerNetWorth}</span>
                                             </div>
 
                                             {/* Breakdown */}
                                             <div
-                                                className="grid grid-cols-[auto_1fr] gap-x-3 text-xl leading-none text-black ml-auto"
+                                                className="grid grid-cols-[auto_1fr] gap-x-2 text-base leading-none text-black ml-auto"
                                                 style={{ fontFamily: 'var(--font-lilita-one)' }}
                                             >
                                                 <span className="text-right">CASH</span>
