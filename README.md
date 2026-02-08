@@ -27,7 +27,26 @@ Event details:
 
 ## Tech
 - Next.js (App Router)
-- Google Gemini (LLM for news classification)
+- Google Gemini (LLM for news classification & impact generation)
+
+### AI Features
+
+#### 1. News Classification (Gemini)
+Real-world news headlines are sent to the Gemini LLM and analyzed:
+- **Type**: `MARKET` (affects specific industry) or `NOISE` (random chaos)
+- **Tag**: One of 6 industries — `AI`, `CHIPS`, `ENERGY`, `GOV`, `CRYPTO`, `MEDIA`
+- **Direction**: `UP` (positive effect) or `DOWN` (negative effect)
+- **Reason**: A short satirical explanation
+- **Reaction**: A funny tabloid-style quip
+
+#### 2. Impact Text Generation
+After news classification, the game generates a human-readable impact sentence:
+- Displayed in the UI after each news event
+- Examples:
+  - `"AI Agent stocks surge — price +100"`
+  - `"Crypto stocks sink — price -200"`
+  - `"Market holds steady — no sector moves"`
+- Calculated dynamically based on the classified tag and direction
 
 ## Getting Started
 Install dependencies and run the dev server:
