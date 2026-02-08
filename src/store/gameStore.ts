@@ -484,25 +484,18 @@ export const useGameStore = create<GameState>((set, get) => ({
             return;
         }
 
-        const totalShares = tile.shareholders.reduce((acc, h) => acc + h.shares, 0);
-
-        const updatedPlayers = players.map(p => {
-            if (p.id === payer.id) {
-                return { ...p, money: sale.cash - dividend };
-            }
-            return p;
-        });
-
-        if (totalShares === 0) {
-            set({ players: updatedPlayers, board: sale.board });
-            return;
-        }
-
-        const perShare = Math.floor(dividend / totalShares);
-        const distributedPlayers = updatedPlayers.map(p => {
+        // 一株当たり配当方式: 各株主は 所有株数 × D を受け取る
+        const distributedPlayers = players.map(p => {
             const owned = tile.shareholders.find(h => h.playerId === p.id)?.shares || 0;
+            const received = owned * dividend;
+
+            if (p.id === payer.id) {
+                // 支払者: Dを払い、所有株分を受け取る
+                return { ...p, money: sale.cash - dividend + received };
+            }
+
             if (owned === 0) return p;
-            return { ...p, money: p.money + (owned * perShare) };
+            return { ...p, money: p.money + received };
         });
 
         const applied = applyBankruptcyAndIpo(sale.board, get().ipoIndex);
@@ -510,4 +503,5 @@ export const useGameStore = create<GameState>((set, get) => ({
         playSound('share-gain', 0.5);
         set({ players: distributedPlayers, board: applied.board, ipoIndex: applied.ipoIndex });
     }
+
 }));

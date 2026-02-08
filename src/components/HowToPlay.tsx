@@ -17,10 +17,11 @@ export function HowToPlay() {
                 </h4>
             </div>
             <ul className="space-y-2 list-disc pl-6 text-xs leading-tight">
-                <li>Roll dice to move around the loop.</li>
-                <li>Every turn, <strong>World News</strong> changes property values or rents.</li>
-                <li><strong>D</strong> means the fee/dividend (example: <strong>D250</strong>).</li>
-                <li>Buy shares to earn dividends and outlast your opponents.</li>
+                <li>📰 Each turn, <strong>Breaking News</strong> changes Fees and Share Prices.</li>
+                <li>🎲 Choose: <strong>ROLL</strong> or <strong>SELL shares</strong> (then ROLL).</li>
+                <li>💸 Pay the <strong>Fee</strong> when you stop — shareholders get the payout.</li>
+                <li>🛒 Buy shares after moving. Each company has up to <strong>3 shares</strong>.</li>
+                <li>🎯 Don&apos;t go broke! Highest <strong>Net Worth</strong> after 15 turns wins.</li>
             </ul>
         </div>
     );

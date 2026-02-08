@@ -5,6 +5,7 @@ import { ControlPanel } from "@/components/ControlPanel";
 import { NewsTicker } from "@/components/NewsTicker";
 import { ResultModal } from "@/components/ResultModal";
 import { HowToPlay } from "@/components/HowToPlay";
+import { GameDescription } from "@/components/GameDescription";
 import { useGameStore } from "@/store/gameStore";
 import { useEffect, useState } from "react";
 import { playBgm } from "@/lib/sound";
@@ -43,11 +44,7 @@ export default function Home() {
       return (
         <main className="min-h-screen bg-[#efede6] flex items-center justify-center px-6">
           <div className="w-full max-w-[1200px] flex flex-col items-center gap-10">
-            <img
-              src="/description.svg"
-              alt="How to Play"
-              className="w-full max-w-[1100px] h-auto"
-            />
+            <GameDescription />
             <button
               onClick={() => setShowIntro(false)}
               className="px-10 py-3 rounded-full text-2xl tracking-wide bg-black text-white"
@@ -105,7 +102,7 @@ export default function Home() {
       <NewsTicker />
 
       {/* Main Content */}
-        <div className="flex-1 w-full max-w-7xl mx-auto flex flex-col lg:flex-row items-start justify-center gap-6 p-2 md:p-8">
+      <div className="flex-1 w-full max-w-7xl mx-auto flex flex-col lg:flex-row items-start justify-center gap-6 p-2 md:p-8">
 
         {/* Left: How to Play (Desktop) */}
         <div className="hidden lg:block w-64 lg:sticky lg:top-8 shrink-0">

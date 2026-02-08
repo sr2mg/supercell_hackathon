@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Rammetto_One, Inter, Bebas_Neue, Lilita_One } from "next/font/google";
+import { Rammetto_One, Inter, Bebas_Neue, Lilita_One, Playfair_Display } from "next/font/google";
 import "./globals.css";
 
 const rammettoOne = Rammetto_One({
@@ -25,6 +25,12 @@ const lilitaOne = Lilita_One({
   subsets: ["latin"],
 });
 
+const playfairDisplay = Playfair_Display({
+  weight: ["400", "500", "600", "700"],
+  variable: "--font-playfair-display",
+  subsets: ["latin"],
+});
+
 export const metadata: Metadata = {
   title: "STOP the PRESSES!",
   description: "A news-based board game",
@@ -38,7 +44,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${rammettoOne.variable} ${inter.variable} ${bebasNeue.variable} ${lilitaOne.variable} antialiased`}
+        className={`${rammettoOne.variable} ${inter.variable} ${bebasNeue.variable} ${lilitaOne.variable} ${playfairDisplay.variable} antialiased`}
         suppressHydrationWarning
       >
         {children}
