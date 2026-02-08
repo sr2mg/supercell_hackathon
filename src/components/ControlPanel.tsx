@@ -246,24 +246,28 @@ export function ControlPanel() {
                         <div className="flex flex-col gap-4 animate-in fade-in slide-in-from-top-2 duration-300">
                             {/* Actions */}
                             <div className="grid grid-cols-2 gap-2 shrink-0">
-                                <button
-                                    onClick={rollDice}
-                                    disabled={isRolling || hasRolled || activePlayer.isComputer}
-                                    className="col-span-2 text-black text-4xl tracking-widest leading-none py-2 border-4 border-black rounded-full disabled:opacity-30 transition-all flex items-center justify-center hover:scale-105 active:scale-95"
-                                    style={{ fontFamily: 'var(--font-lilita-one)' }}
-                                >
-                                    {isRolling ? 'ROLLING...' : 'ROLL'}
-                                </button>
+                                {!hasRolled && (
+                                    <button
+                                        onClick={rollDice}
+                                        disabled={isRolling || hasRolled || activePlayer.isComputer}
+                                        className="col-span-2 text-black text-4xl tracking-widest leading-none py-2 border-4 border-black rounded-full disabled:opacity-30 transition-all flex items-center justify-center hover:scale-105 active:scale-95"
+                                        style={{ fontFamily: 'var(--font-lilita-one)' }}
+                                    >
+                                        {isRolling ? 'ROLLING...' : 'ROLL'}
+                                    </button>
+                                )}
 
-                                {canBuy && !activePlayer.isComputer && (
+                                {!activePlayer.isComputer && currentTile.price > 0 && (
                                     <button
                                         onClick={() => {
                                             playSound('share-pay', 0.5);
                                             buyShare(currentTile.id);
                                         }}
-                                        className="col-span-2 bg-green-600 text-white py-3 rounded-lg font-bold hover:bg-green-700 transition-all flex items-center justify-center gap-2 animate-bounce-short shadow-md"
+                                        disabled={!canBuy || activePlayer.money < currentTile.price}
+                                        className="col-span-2 bg-green-600 text-white text-4xl tracking-widest leading-none py-2 border-4 border-black rounded-full transition-all flex items-center justify-center gap-2 hover:scale-105 active:scale-95 shadow-md disabled:opacity-30 disabled:scale-100 disabled:shadow-none"
+                                        style={{ fontFamily: 'var(--font-lilita-one)' }}
                                     >
-                                        <DollarSign size={18} /> Buy 1 share ({currentTile.name}) ({currentTile.price})
+                                        <DollarSign size={32} strokeWidth={3} /> BUY ${currentTile.price}
                                     </button>
                                 )}
 
