@@ -1,0 +1,2 @@
+- [x] Adjust `breaking-news` volume in `src/components/NewsTicker.tsx` from 0.6 to 0.4 <!-- id: 0 -->
+- [x] Verify the change <!-- id: 1 -->

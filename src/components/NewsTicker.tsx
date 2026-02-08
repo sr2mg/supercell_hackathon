@@ -26,7 +26,7 @@ export function NewsTicker() {
         if (currentNews) {
             setVisible(true);
             if (currentNews.type === 'MARKET') {
-                playSound('breaking-news', 0.6);
+                playSound('breaking-news', 0.4);
             } else {
                 playSound('negative', 0.4);
             }

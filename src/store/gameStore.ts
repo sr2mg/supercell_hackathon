@@ -107,11 +107,6 @@ export const useGameStore = create<GameState>((set, get) => ({
     rollDice: () => {
         const { turnCount, activePlayerIndex, triggerNews } = get();
 
-        // Trigger news at the start of turn 1 (first player's first roll)
-        if (turnCount === 1 && activePlayerIndex === 0 && !get().hasRolled && get().currentNews === null) {
-            triggerNews();
-        }
-
         const d1 = Math.floor(Math.random() * 6) + 1;
         // Set target dice immediately so UI can animate towards it
         set({ isRolling: true, dice: [d1, 1] });

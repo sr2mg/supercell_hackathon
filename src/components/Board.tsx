@@ -1,4 +1,5 @@
 'use client';
+import { useEffect } from 'react';
 import { useGameStore } from '@/store/gameStore';
 import { Tile } from './Tile';
 import { DiceRollModal } from './DiceRollModal';
@@ -6,10 +7,22 @@ import { useShallow } from 'zustand/react/shallow';
 import { getGridSize, getTileGridArea } from '@/lib/boardUtils';
 
 export function Board() {
-    const { board, players } = useGameStore(useShallow(state => ({
+    const { board, players, turnCount, activePlayerIndex, hasRolled, currentNews, triggerNews } = useGameStore(useShallow(state => ({
         board: state.board,
-        players: state.players
+        players: state.players,
+        turnCount: state.turnCount,
+        activePlayerIndex: state.activePlayerIndex,
+        hasRolled: state.hasRolled,
+        currentNews: state.currentNews,
+        triggerNews: state.triggerNews
     })));
+
+    useEffect(() => {
+        // Trigger news at the very start of the game (Turn 1, Player 1, before rolling)
+        if (turnCount === 1 && activePlayerIndex === 0 && !hasRolled && !currentNews) {
+            triggerNews();
+        }
+    }, [turnCount, activePlayerIndex, hasRolled, currentNews, triggerNews]);
 
     // Calculate grid dimensions
     const totalTiles = board.length;
