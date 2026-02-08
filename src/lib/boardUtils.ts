@@ -103,3 +103,22 @@ export function getTileGridArea(index: number, totalTiles: number): GridCoordina
 export function getGridSize(totalTiles: number): number {
     return Math.floor(totalTiles / 4) + 1;
 }
+
+/**
+ * タイル位置に基づいてパーセンテージ座標を計算
+ * ウィンドウサイズが変わっても相対位置は維持される（パーセンテージベース）
+ * 
+ * @param position タイルのインデックス（0-based）
+ * @param totalTiles ボード上のタイル総数
+ * @param sideLength グリッドの一辺の長さ（getGridSizeで計算）
+ * @returns x, y座標（パーセンテージ、0-100）
+ */
+export function getTileCenter(position: number, totalTiles: number, sideLength: number): { x: number; y: number } {
+    const coords = getTileGridArea(position, totalTiles);
+    // グリッドのcol/rowは1-indexed、セルサイズは100/sideLength %
+    const cellSize = 100 / sideLength;
+    // セルの中央を計算 (colStart-1 * cellSize + cellSize/2)
+    const x = (coords.colStart - 1) * cellSize + cellSize / 2;
+    const y = (coords.rowStart - 1) * cellSize + cellSize / 2;
+    return { x, y };
+}
